@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cole Hall — Skills</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .skill-category {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .skill-category:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-dim);
+        }
+
+        .skill-category h2 {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 11px;
+            color: var(--accent);
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .skill-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .skill-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .skill-name {
+            font-size: 10px;
+            color: var(--text);
+            letter-spacing: 1px;
+        }
+
+        .skill-level {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .skill-bar-bg {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent-glow);
+            transition: width 1s ease;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 48px;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .tool-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-dim);
+        }
+
+        .tool-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .tool-name {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .currently-learning {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 48px;
+        }
+
+        .currently-learning h2 {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 11px;
+            color: var(--accent);
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .learning-items {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .learning-tag {
+            background: var(--accent-dim);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 14px;
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .section-label {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <span class="nav-logo">CH</span>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="skills.html" class="active">Skills</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-header">
+        <h1>Skills</h1>
+        <p>Languages, tools, and concepts — all learned by building real things.</p>
+    </div>
+
+    <div class="container">
+
+        <p class="section-label">Languages</p>
+        <div class="skills-grid">
+
+            <div class="skill-category">
+                <h2>Web Technologies</h2>
+                <div class="skill-list">
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">HTML</span>
+                            <span class="skill-level">Proficient</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">CSS</span>
+                            <span class="skill-level">Proficient</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">JavaScript</span>
+                            <span class="skill-level">Intermediate</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 70%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">Canvas API</span>
+                            <span class="skill-level">Familiar</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">Web Audio API</span>
+                            <span class="skill-level">Familiar</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <h2>Other Languages</h2>
+                <div class="skill-list">
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">C#</span>
+                            <span class="skill-level">Intermediate</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">SQL</span>
+                            <span class="skill-level">Intermediate</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">Python</span>
+                            <span class="skill-level">Familiar</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 40%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-label">
+                            <span class="skill-name">Delphi 2007</span>
+                            <span class="skill-level">Familiar</span>
+                        </div>
+                        <div class="skill-bar-bg">
+                            <div class="skill-bar-fill" style="width: 25%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <p class="section-label">Tools & Environment</p>
+        <div class="tools-grid">
+            <div class="tool-card">
+                <span class="tool-icon">💻</span>
+                <span class="tool-name">VS Code</span>
+            </div>
+            <div class="tool-card">
+                <span class="tool-icon">🌐</span>
+                <span class="tool-name">Browser DevTools</span>
+            </div>
+            <div class="tool-card">
+                <span class="tool-icon">🗄️</span>
+                <span class="tool-name">localStorage</span>
+            </div>
+            <div class="tool-card">
+                <span class="tool-icon">🎮</span>
+                <span class="tool-name">Game Design</span>
+            </div>
+            <div class="tool-card">
+                <span class="tool-icon">🎨</span>
+                <span class="tool-name">CSS Grid & Flex</span>
+            </div>
+            <div class="tool-card">
+                <span class="tool-icon">🔊</span>
+                <span class="tool-name">Web Audio</span>
+            </div>
+        </div>
+
+        <div class="currently-learning">
+            <h2>Currently Exploring</h2>
+            <div class="learning-items">
+                <span class="learning-tag">Node.js</span>
+                <span class="learning-tag">APIs</span>
+                <span class="learning-tag">Databases</span>
+                <span class="learning-tag">Backend Development</span>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        ✦ Cole Hall — Built by hand ✦
+    </footer>
+
+</body>
+
+</html>

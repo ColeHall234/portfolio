@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Ritual</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #start-btn {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: transparent;
+            color: #c9a84c;
+            border: 1px solid #c9a84c;
+            padding: 16px 32px;
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            cursor: pointer;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+        }
+
+        #start-btn:hover {
+            background: #c9a84c22;
+            box-shadow: 0 0 20px #c9a84c44;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="ritual-canvas"></canvas>
+    <button id="start-btn" onclick="start_ritual()">Begin the Ritual</button>
+
+    <script src="js/sound.js"></script>
+    <script src="js/ritual.js"></script>
+</body>
+</html>

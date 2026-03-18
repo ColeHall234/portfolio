@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steel Idle</title>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <header>
+      <h1>Steel Idle</h1>
+    </header>
+
+    <div id="notification" class="notification hidden">
+      <p id="notification-message"></p>
+    </div>
+<main id="game-container">
+
+    <section id="panel-resources">
+    <div id="resources">
+      <p>Iron Ore: <span id="iron-ore">0</span></p>
+      <p>Coal: <span id="coal">0</span></p>
+      <p>Limestone: <span id="limestone">0</span></p>
+      <p>Coke: <span id="coke">0</span></p>
+      <p>Cash: $<span id="cash">0</span></p>
+    </div>
+    </section>
+
+    <section id="panel-actions">
+    <div id="actions">
+      <button id="mine-iron">Mine Iron Ore</button>
+      <button id="mine-coal">Mine Coal</button>
+      <button id="mine-limestone">Mine Limestone</button>
+      <button id="sell-ore">Sell All Ore</button>
+    </div>
+    </section>
+
+    <section id="panel-buildings">
+        <h2>Buildings</h2>
+
+        <div id="coke-oven-building">
+            <p>Coke Oven - $<span id="coke-oven-cost">50</span></p>
+            <p>Converts <span>2 Coal</span> into <span>3 Coke</span> every 5 seconds</p>
+            <button id="buy-coke-oven">Buy Coke Oven</button>
+        </div>
+        <div id="iron-shaft-building">
+            <p>Iron Shaft - $<span id="iron-shaft-cost">100</span></p>
+            <p>Produces <span>1 Iron Ore</span> every 10 seconds</p>
+            <button id="buy-iron-shaft">Buy Iron Shaft</button>
+        </div>
+        <div id="coal-shaft-building">
+            <p>Coal Shaft - $<span id="coal-shaft-cost">150</span></p>
+            <p>Produces <span>1 Coal</span> every 15 seconds</p>
+            <button id="buy-coal-shaft">Buy Coal Shaft</button>
+        </div>
+        <div id="limestone-shaft-building">
+            <p>Limestone Shaft - $<span id="limestone-shaft-cost">120</span></p>
+            <p>Produces <span>1 Limestone</span> every 20 seconds</p>
+            <button id="buy-limestone-shaft">Buy Limestone Shaft</button>
+        </div>
+    </section>
+
+    <section id="panel-contracts">
+  <h2>Contracts</h2>
+
+  <div id="available-contracts">
+    <h3>Available</h3>
+    <div id="contracts-list"></div>
+  </div>
+
+  <div id="active-contract">
+    <h3>Active</h3>
+    <div id="active-contract-details" class="contract-card hidden">
+      <p class="contract-client" id="active-client"></p>
+      <p class="contract-description" id="active-description"></p>
+      <div id="active-progress-list"></div>
+      <p class="contract-reward" id="active-reward"></p>
+    </div>
+    <p id="no-active-contract">No active contract.</p>
+  </div>
+
+</section>
+
+    <section id="panel-rank">
+      <h2>Rank</h2>
+      <p id="rank-title-display">Cinder Boys</p>
+      <div id="exp-bar-container">
+        <div id="exp-bar"></div>
+      </div>
+      <p id="exp-label">0 / 100 EXP</p>
+    </section>
+
+</main>
+
+<footer id ="game-footer">
+  <button id="save-game">Save Game</button>
+  <button id="delete-save">Delete Save</button>
+</footer>
+    <script src="js/game.js"></script>
+    <script src="js/save.js"></script>
+    <script src="js/ui.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Clicker Game</title>
+    <script>
+        let souls = 0;
+        let souls_per_second = 0;
+        let tick = 0;
+        let souls_per_click = 1;
+        let total_souls = 0;
+        let audio_ctx = null;
+        let dark_essence = 0;
+        let soul_multiplier = 1;
+        const PRESTIGE_COST = 100000;
+
+        let lore_entries = [
+            { threshold: 0, title: "Day One", text: "I have begun the ritual. The grimoire speaks of a harvest — souls drawn from the void between worlds. Tonight I claimed my first.", unlocked: true },
+            { threshold: 50, title: "The Hunger", text: "There is a warmth to it now. Each soul collected feels less like theft and more like... reunion. I do not sleep.", unlocked: false },
+            { threshold: 200, title: "First Servant", text: "I sent a digger into the old cemetery at the edge of the village. He does not speak anymore. He does not need to.", unlocked: false },
+            { threshold: 750, title: "The Veil Thins", text: "I can see them now without closing my eyes. They drift through the walls of my study, curious. Some are afraid. Good.", unlocked: false },
+            { threshold: 2000, title: "A Pact Sealed", text: "It had a name once. I did not ask it. Names give power and I will not surrender that here. It serves. That is enough.", unlocked: false },
+            { threshold: 8000, title: "What I Was", text: "I found a portrait of myself from before. I do not recognize the face. It looks... soft. Naive. I burned it.", unlocked: false },
+            { threshold: 25000, title: "They Whisper Back", text: "The souls speak now. Not in words — in certainty. They know what I am becoming. They do not resist.", unlocked: false },
+            { threshold: 100000, title: "Inevitable", text: "There is no word for what I am. The old texts come closest with 'Devourer' but even that feels insufficient. I have stopped counting. The harvest continues.", unlocked: false }
+        ];
+
+        function calculate_multiplier() {
+            soul_multiplier = 1 + (dark_essence * 0.1);
+        }
+
+        function check_lore() {
+            let newly_unlocked = false;
+            lore_entries.forEach(function (entry) {
+                if (!entry.unlocked && total_souls >= entry.threshold) {
+                    entry.unlocked = true;
+                    newly_unlocked = true;
+                }
+            });
+            if (newly_unlocked) {
+                render_lore();
+            }
+        }
+
+        function render_lore() {
+            let log = document.getElementById("lore-log");
+            log.innerHTML = "";
+            let unlocked = lore_entries.filter(function (entry) {
+                return entry.unlocked;
+            });
+            unlocked.reverse().forEach(function (entry) {
+                let div = document.createElement("div");
+                div.className = "lore-entry";
+                div.innerHTML = "<span class='lore-title'>" + entry.title + "</span><p class='lore-text'>" + entry.text + "</p>";
+                log.appendChild(div);
+            });
+        }
+
+        function get_audio() {
+            if (!audio_ctx) {
+                audio_ctx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audio_ctx;
+        }
+
+        function play_sound(frequency, duration, type, volume) {
+            let ctx = get_audio();
+            let oscillator = ctx.createOscillator();
+            let gain = ctx.createGain();
+
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            gain.gain.setValueAtTime(volume, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+            oscillator.start(ctx.currentTime);
+            oscillator.stop(ctx.currentTime + duration);
+        }
+
+        function sound_harvest() {
+            play_sound(220, 0.1, "sine", 0.3);
+        }
+
+        function sound_purchase() {
+            play_sound(440, 0.15, "sine", 0.4)
+            setTimeout(function () {
+                play_sound(550, 0.2, "sine", 0.3);
+            }, 100);
+        }
+
+        function sound_achievement() {
+            play_sound(523, 0.1, "sine", 0.4);
+            setTimeout(function () {
+                play_sound(659, 0.1, "sine", 0.4)
+            }, 120);
+            setTimeout(function () {
+                play_sound(784, 0.3, "sine", 0.4)
+            }, 240);
+        }
+
+        let milestones = [
+            { threshold: 100, message: "The dead stir. Your power awakens.", claimed: false },
+            { threshold: 500, message: "Spirits bow before you, dark one.", claimed: false },
+            { threshold: 1000, message: "A thousand souls. The veil grows thin.", claimed: false },
+            { threshold: 5000, message: "Demons whisper your name in the abyss.", claimed: false },
+            { threshold: 10000, message: "You are no longer mortal. You are inevitable.", claimed: false }
+        ];
+
+        let achievements = [
+            { id: "first_blood", title: "First Blood", desc: "Harvest your first soul", icon: "🩸", earned: false, check: function () { return souls >= 1; } },
+            { id: "grave_robber", title: "Grave Robber", desc: "Own 10 Gravediggers", icon: "💀", earned: false, check: function () { return gravedigger.count >= 10; } },
+            { id: "spirit_army", title: "Spirit Army", desc: "Own 5 Wraiths", icon: "👁️", earned: false, check: function () { return wraith.count >= 5; } },
+            { id: "damned", title: "Damned", desc: "Complete your first Demon Pact", icon: "😈", earned: false, check: function () { return demon.count >= 1; } },
+            { id: "unstoppable", title: "Unstoppable", desc: "Reach 50 souls per click", icon: "⚡", earned: false, check: function () { return souls_per_click >= 50; } },
+            { id: "soul_lord", title: "Soul Lord", desc: "Accumulate 100,000 souls", icon: "🌑", earned: false, check: function () { return total_souls >= 100000; } }
+        ];
+
+        let gravedigger = {
+            count: 0,
+            cost: 15,
+            base_cost: 15,
+            sps: 1
+        }
+
+        let wraith = {
+            count: 0,
+            cost: 100,
+            base_cost: 100,
+            sps: 5
+        }
+
+        let demon = {
+            count: 0,
+            cost: 1000,
+            base_cost: 1000,
+            sps: 25
+
+        }
+
+        let blood_ritual = {
+            count: 0,
+            cost: 50,
+            base_cost: 50,
+            spc: 2
+        }
+
+        let soul_surge = {
+            count: 0,
+            cost: 500,
+            base_cost: 500,
+            spc: 10
+        }
+
+        function format_number(n) {
+            if (n >= 1000000000) return (n / 1000000000).toFixed(1) + "B";
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+            if (n >= 1000) return (n / 1000).toFixed(1) + "k";
+            return Math.floor(n).toString();
+        }
+
+        function check_milestones() {
+            milestones.forEach(function (milestone) {
+                if (souls >= milestone.threshold && !milestone.claimed) {
+                    milestone.claimed = true;
+                    show_message(milestone.message);
+                }
+            })
+        }
+
+        function harvest_soul() {
+            souls += souls_per_click * soul_multiplier;
+            total_souls += souls_per_click * soul_multiplier;
+            sound_harvest();
+            check_lore();
+            check_milestones();
+            check_achievements();
+            update_display();
+        }
+
+        function check_achievements() {
+            achievements.forEach(function (achievement) {
+                if (!achievement.earned && achievement.check()) {
+                    achievement.earned = true;
+                    show_achievement(achievement);
+                }
+            })
+        }
+
+        function show_achievement(achievement) {
+            let popup = document.getElementById("achievement-popup");
+            sound_achievement();
+            popup.innerHTML = achievement.icon + " <strong>" + achievement.title + "</strong> - " + achievement.desc;
+            popup.style.opacity = "1";
+            popup.style.transform = "translateY(0)";
+            setTimeout(function () {
+                popup.style.opacity = "0";
+                popup.style.transform = "translateY(-20px)";
+            }, 3000);
+            update_achievement_display();
+        }
+
+        function update_achievement_display() {
+            let grid = document.getElementById("achievement-grid");
+            grid.innerHTML = "";
+            achievements.forEach(function (achievement) {
+                let item = document.createElement("div");
+                item.className = achievement.earned ? "achievement earned" : "achievement locked";
+                item.innerHTML = "<span class='ach-icon'>" + achievement.icon + "</span><span class='ach-title'>" + achievement.title + "</span>";
+                item.title = achievement.desc;
+                grid.appendChild(item);
+            });
+        }
+
+        function buy_click_upgrade(upgrade, name) {
+            if (souls >= upgrade.cost) {
+                sound_purchase();
+                souls -= upgrade.cost;
+                upgrade.count += 1;
+                souls_per_click += upgrade.spc;
+                upgrade.cost = Math.ceil(upgrade.base_cost * Math.pow(1.6, upgrade.count));
+                document.getElementById(name + "-cost").innerText = format_number(upgrade.cost);
+                document.getElementById(name + "-count").innerText = upgrade.count;
+                check_achievements();
+                update_display();
+            }
+        }
+
+        function buy_upgrade(upgrade, name) {
+            if (souls >= upgrade.cost) {
+                sound_purchase();
+                souls -= upgrade.cost;
+                upgrade.count += 1;
+                souls_per_second += upgrade.sps;
+                upgrade.cost = Math.ceil(upgrade.base_cost * Math.pow(1.5, upgrade.count));
+                document.getElementById(name + "-cost").innerText = format_number(upgrade.cost);
+                document.getElementById(name + "-count").innerText = upgrade.count;
+                check_achievements();
+                update_display();
+            }
+        }
+
+        function prestige() {
+            if (total_souls < PRESTIGE_COST) return;
+
+            let earned = Math.floor(total_souls / PRESTIGE_COST);
+            dark_essence += earned;
+            calculate_multiplier();
+
+            souls = 0;
+            total_souls = 0;
+            souls_per_second = 0;
+            souls_per_click = 1;
+
+            gravedigger = { count: 0, cost: 15, base_cost: 15, sps: 1 };
+            wraith = { count: 0, cost: 100, base_cost: 100, sps: 5 };
+            demon = { count: 0, cost: 1000, base_cost: 1000, sps: 25 };
+            blood_ritual = { count: 0, cost: 50, base_cost: 50, spc: 2 };
+            soul_surge = { count: 0, cost: 500, base_cost: 500, spc: 10 };
+
+            milestones.forEach(function (m) { m.claimed = false; });
+            lore_entries.forEach(function (e) { e.unlocked = e.threshold === 0; });
+
+            document.getElementById("gravedigger-cost").innerText = format_number(gravedigger.cost);
+            document.getElementById("gravedigger-count").innerText = 0;
+            document.getElementById("wraith-cost").innerText = format_number(wraith.cost);
+            document.getElementById("wraith-count").innerText = 0;
+            document.getElementById("demon-cost").innerText = format_number(demon.cost);
+            document.getElementById("demon-count").innerText = 0;
+            document.getElementById("blood_ritual-cost").innerText = format_number(blood_ritual.cost);
+            document.getElementById("blood_ritual-count").innerText = 0;
+            document.getElementById("soul_surge-cost").innerText = format_number(soul_surge.cost);
+            document.getElementById("soul_surge-count").innerText = 0;
+
+            save_game();
+            update_display();
+            render_lore();
+            show_prestige_message(earned);
+        }
+
+        function show_prestige_message(earned) {
+            let msg = document.getElementById("milestone-msg");
+            msg.innerText = "✦ Ascension complete. +" + earned + " Dark Essence. The cycle begins anew.";
+            msg.style.opacity = "1";
+            setTimeout(function () {
+                msg.style.opacity = "0";
+            }, 6000);
+        }
+
+
+
+        function show_offline_message(earned, seconds) {
+            let minutes = Math.floor(seconds / 60);
+            let time_str = minutes < 60 ? minutes + " minutes" : Math.floor(minutes / 60) + " hours";
+            let msg = document.getElementById("milestone-msg");
+            msg.innerText = "Welconme back. " + time_str + " passed. +" + format_number(earned) + " souls collected.";
+            msg.style.opacity = "1";
+            setTimeout(function () {
+                msg.style.opacity = "0";
+            }, 6000);
+        }
+
+        function update_display() {
+            document.getElementById("score").innerText = "Souls: " + format_number(souls);
+            document.getElementById("sps-display").innerText = "Souls per second: " + format_number(souls_per_second) + " | Per click: " + format_number(souls_per_click);
+            document.getElementById("essence-display").innerText = "Dark Essence: " + dark_essence + " | Multiplier: x" + soul_multiplier.toFixed(1);
+            let btn = document.getElementById("prestige-btn");
+            if (total_souls >= PRESTIGE_COST) {
+                btn.style.display = "block";
+
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        function show_message(text) {
+            let msg = document.getElementById("milestone-msg");
+            msg.innerText = text;
+            msg.style.opacity = "1";
+            setTimeout(function () {
+                msg.style.opacity = "0";
+            }, 4000);
+        }
+
+        setInterval(function () {
+            souls += souls_per_second * soul_multiplier;
+            total_souls += souls_per_second * soul_multiplier;
+            update_display();
+            check_lore();
+            check_achievements();
+            check_milestones();
+            tick += 1;
+            if (tick % 10 === 0) {
+                save_game();
+            }
+        }, 1000);
+
+        function save_game() {
+            let save_data = {
+                last_saved: Date.now(),
+                souls: souls,
+                souls_per_second: souls_per_second,
+                gravedigger: gravedigger,
+                wraith: wraith,
+                demon: demon,
+                blood_ritual: blood_ritual,
+                soul_surge: soul_surge,
+                souls_per_click: souls_per_click,
+                total_souls: total_souls,
+                dark_essence: dark_essence,
+                soul_multiplier: soul_multiplier
+            }
+            localStorage.setItem("soul_harvest_save", JSON.stringify(save_data));
+        }
+
+        function load_game() {
+            let saved = localStorage.getItem("soul_harvest_save");
+            if (saved) {
+                let data = JSON.parse(saved);
+                souls = data.souls;
+                souls_per_second = data.souls_per_second;
+                gravedigger = data.gravedigger;
+                wraith = data.wraith;
+                demon = data.demon;
+                souls_per_click = data.souls_per_click || 1;
+                total_souls = data.total_souls || 0;
+                blood_ritual = data.blood_ritual;
+                soul_surge = data.soul_surge;
+                dark_essence = data.dark_essence || 0;
+                soul_multiplier = data.soul_multiplier || 1;
+                document.getElementById("essence-display").innerText = "Dark Essence: " + dark_essence + " | Multiplier: x" + soul_multiplier.toFixed(1);
+                document.getElementById("gravedigger-cost").innerText = format_number(gravedigger.cost);
+                document.getElementById("gravedigger-count").innerText = format_number(gravedigger.count);
+                document.getElementById("wraith-cost").innerText = format_number(wraith.cost);
+                document.getElementById("wraith-count").innerText = format_number(wraith.count);
+                document.getElementById("demon-cost").innerText = format_number(demon.cost);
+                document.getElementById("demon-count").innerText = format_number(demon.count);
+                document.getElementById("blood_ritual-cost").innerText = format_number(blood_ritual.cost);
+                document.getElementById("blood_ritual-count").innerText = format_number(blood_ritual.count);
+                document.getElementById("soul_surge-cost").innerText = format_number(soul_surge.cost);
+                document.getElementById("soul_surge-count").innerText = format_number(soul_surge.count);
+
+                if (data.last_saved) {
+                    let now = Date.now();
+                    let elapsed_seconds = Math.floor((now - data.last_saved) / 1000);
+                    let offline_cap = 60 * 60 * 4;
+                    let capped_seconds = Math.min(elapsed_seconds, offline_cap);
+                    if (capped_seconds > 0 && souls_per_second > 0) {
+                        let earned = capped_seconds * souls_per_second;
+                        souls += earned;
+                        total_souls += earned;
+                        show_offline_message(earned, capped_seconds);
+                    }
+                };
+
+                update_display();
+                update_achievement_display();
+                check_lore();
+            }
+        }
+
+        window.onload = function () {
+            load_game();
+            update_achievement_display();
+            render_lore();
+        }
+
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background-color: #0a0a0f;
+            background-image: radial-gradient(ellipse at top, #1a0a2e 0%, #0a0a0f 70%);
+            color: #c9a84c;
+            font-family: 'Cinzel', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        h2 {
+            font-family: 'cinzel decorative', cursive;
+            font-size: 28px;
+            color: #c9a84c;
+            text-shadow: 0 0 20px #c9a84c, 0 0 40px #7b2d8b;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-family: 'cinzel decorative', cursive;
+            font-size: 22px;
+            color: #f0c060;
+            text-shadow: 0 0 15px #c9a84c;
+            margin-bottom: 5px;
+        }
+
+        #sps-display {
+            font-size: 13px;
+            color: #7b5ea7;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        button#harvest-btn {
+            background: linear-gradient(180deg, #2a0a3e, #1a0528);
+            color: #f0c060;
+            border: 2px solid #7b2d8b;
+            padding: 16px 40px;
+            font-family: 'cinzel decorative', cursive;
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px #7b2d8b55;
+            transition: all 0.2s ease;
+        }
+
+        button#harvest-btn:hover {
+            background: linear-gradient(180deg, #3d0f5a, #2a0a3e);
+            box-shadow: 0 0 30px #7b2d8b;
+            color: #ffffff;
+        }
+
+        #upgrade-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        .upgrade-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            background: linear-gradient(180deg, #0d0118, #080010);
+            border: 1px solid #3d1f5a;
+            padding: 16px;
+            box-shadow: inset 0 0 30px #00000088;
+        }
+
+        .section-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 11px;
+            color: #7b2d8b;
+            text-shadow: 0 0 10px #7b2d8b;
+            letter-spacing: 3px;
+            margin: 0 0 10px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #3d1f5a;
+        }
+
+        .upgrade-section button {
+            background: linear-gradient(180deg, #150520, #0d0118);
+            color: #c9a84c;
+            border: 1px solid #3d1f5a;
+            padding: 12px 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-align: left;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 0 20px #00000066;
+        }
+
+        .upgrade-section button:hover {
+            border-color: #c9a84c;
+            box-shadow: 0 0 15px #c9a84c33;
+            color: #f0c060;
+        }
+
+        #upgrades button {
+            background: linear-gradient(180deg, #150520, #0d0118);
+            color: #c9a84c;
+            border: 1px solid #3d1f5a;
+            padding: 14px 2px;
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-align: left;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 0 20px #00000066;
+        }
+
+        #upgrades button:hover {
+            border-color: #c9a84c;
+            box-shadow: 0 0 15px #c9a84c33;
+            color: #f0c060;
+        }
+
+        #save-btn {
+            background: transparent;
+            color: #7b5ea7;
+            border: 1px solid #3d1f5a;
+            padding: 8px 20px;
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            margin-bottom: 20px;
+        }
+
+        #save-btn:hover {
+            color: #c9a84c;
+            border-color: #c9a84c;
+        }
+
+        #milestone-msg {
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            color: #c9a84c;
+            text-shadow: 0 0 10px #c9a84c;
+            letter-spacing: 2px;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 1s ease;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        #achievements-section {
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid #3d1f5a;
+            padding: 16px;
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, #0d0118, #080010);
+        }
+
+        #achievement-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .achievement {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border: 1px solid #3d1f5a;
+            cursor: default;
+            transition: all 0.2s ease;
+        }
+
+        .achievement.earned {
+            border-color: #c9a84c;
+            box-shadow: 0 0 10px #c9a84c44;
+            background: linear-gradient(180deg, #1a0a2e, #0d0118);
+        }
+
+        .achievement.locked {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+
+        .ach-icon {
+            font-size: 24px;
+        }
+
+        .ach-title {
+            font-family: 'Cinzel', serif;
+            font-size: 7px;
+            color: #c9a84c;
+            text-align: center;
+            margin-top: 4px;
+            letter-spacing: 0px;
+        }
+
+        #achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(180deg, #2a0a3e, #1a0528);
+            border: 1px solid #c9a84c;
+            color: #f0c060;
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            padding: 12px 20px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px #c9a84c44;
+        }
+
+        #lore-section {
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid #3d1f5a;
+            padding: 16px;
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, #0d0118, #080010)
+        }
+
+        #lore-log {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-top: 10px;
+        }
+
+        #lore-log::webkit-scrollbar {
+            width: 4px;
+        }
+
+        #lore-log::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+
+        #lore-log::-webkit-scrollbar-thumb {
+            background: #3d1f5a;
+        }
+
+        .lore-entry {
+            border-left: 2px solid #3d1f5a;
+            padding-left: 12px;
+        }
+
+        .lore-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 9px;
+            color: #7b2d8b;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .lore-text {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            color: #8a7a6a;
+            line-height: 1.8;
+            margin: 0;
+            font-style: italic;
+        }
+
+        #essence-display {
+            font-size: 11px;
+            color: #9b4dca;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        #prestige-btn {
+            display: none;
+            background: linear-gradient(180deg, #3d0050, #1a0028);
+            color: #da70d6;
+            border: 2px solid #9b4dca;
+            padding: 14px 36px;
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 11px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            box-shadow: 0 0 25px #9b4dca55;
+            transition: all 0.2s ease;
+        }
+
+        #prestige-btn:hover {
+            background: linear-gradient(180deg, #5a0075, #3d0050);
+            box-shadow: 0 0 40px #9b4dca;
+            color: #ffffff;
+        }
+    </style>
+
+<body>
+    <h2>⚔️ Soul Harvest</h2>
+    <h1 id="score">Souls: 0</h1>
+    <p id="milestone-msg"></p>
+    <p id="sps-display">Souls per second: 0</p>
+    <p id="essence-display">Dark Essence: 0 | Multiplier: x1.0</p>
+    <button id="prestige-btn" onclick="prestige()">✦ Ascend — Sacrifice Everything</button>
+    <button id="harvest-btn" onclick="harvest_soul()">💀 Harvest Soul</button>
+
+    <div id="upgrade-container">
+
+        <div class="upgrade-section">
+            <h3 class="section-title">⚔️ Harvest Power</h3>
+            <button onclick="buy_click_upgrade(blood_ritual, 'blood_ritual')">
+                🩸 Blood Ritual | <span id="blood_ritual-cost">50</span> souls | Owned: <span
+                    id="blood_ritual-count">0</span>
+            </button>
+            <button onclick="buy_click_upgrade(soul_surge, 'soul_surge')">
+                ⚡ Soul Surge | <span id="soul_surge-cost">500</span> souls | Owned: <span id="soul_surge-count">0</span>
+            </button>
+        </div>
+
+        <div class="upgrade-section">
+            <h3 class="section-title">💀 Dark Servants</h3>
+            <button onclick="buy_upgrade(gravedigger, 'gravedigger')">
+                💀 Gravedigger | <span id="gravedigger-cost">15</span> souls | Owned: <span
+                    id="gravedigger-count">0</span>
+            </button>
+            <button onclick="buy_upgrade(wraith, 'wraith')">
+                👁️ Wraith | <span id="wraith-cost">100</span> souls | Owned: <span id="wraith-count">0</span>
+            </button>
+            <button onclick="buy_upgrade(demon, 'demon')">
+                😈 Demon Pact | <span id="demon-cost">1000</span> souls | Owned: <span id="demon-count">0</span>
+            </button>
+        </div>
+
+    </div>
+
+    <div id="achievements-section">
+        <h3 class="section-title">🏆 Achievements</h3>
+        <div id="achievement-grid"></div>
+    </div>
+
+    <div id="achievement-popup"></div>
+
+    <div id="lore-section">
+        <h3 class="section-title">📜 The Chronicle</h3>
+        <div id="lore-log"></div>
+    </div>
+
+    <button id="save-btn" onclick="save_game()">💾 Save Game</button>
+</body>
+
+</html>

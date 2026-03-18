@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Soul Descent</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="player-panel">
+            <h2 id="player-name">The Sorcerer</h2>
+            <div id="player-hp-bar-container">
+                <div id="player-hp-bar">
+                </div>
+            </div>
+            <p id="player-hp-text">HP: 100 / 100</p>
+            <p id="player-mana-text">Mana: 50 / 50</p>
+            <p id="player-stats-text">ATK: 10 | DEF: 2 | Level: 1</p>
+            <p id="player-xp-text">XP: 0 / 100</p>
+            <p id="gold-display">Gold: 0</p>
+            <button id="save-btn" onclick="save_game()">💾 Save Game</button>
+            <button id="delete-save-btn" onclick="delete_save()">🗑️ Delete Save</button>
+        </div>
+        <div id="combat-panel">
+            <p id="floor-display">Floor 1</p>
+            <div id="enemy-container"></div>
+            <div id="combat-log"></div>
+        </div>
+
+        <div id="ability-panel">
+            <h3>Abilities</h3>
+            <div id="ability-buttons"></div>
+        </div>
+        <div id="inventory-panel">
+            <h3>📦 Inventory</h3>
+        </div>
+        <div id="skill-tree-panel">
+            <h3>🌳 Skill Tree</h3>
+            <p id="skill-points-display">Skill Points: 0</p>
+            <div id="skill-tree-grid"></div>
+        </div>
+
+    </div>
+    <div id="hotbar">
+        <p id="hotbar-label">⚡ Quick Use</p>
+        <div id="hotbar-slots"></div>
+    </div>
+    <script src="js/data.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemy.js"></script>
+    <script src="js/combat.js"></script>
+    <script src="js/loot.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/sounds.js"></script>
+    <script src="js/skills.js"></script>
+    <script src="js/save.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
