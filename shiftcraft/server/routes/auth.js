@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
     );
     res.json({ token, email, business_name });
   } catch (err) {
-    if (err.message.includes('UNIQUE')) {
+    if (err.message.includes('UNIQUE')) { 
       return res.status(400).json({ error: 'Email already registered' });
     }
     res.status(500).json({ error: 'Server error' });
