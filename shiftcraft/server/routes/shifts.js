@@ -5,21 +5,27 @@ const authenticate = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/', authenticate, (req, res) => {
-    const { week_start } = req.query;
-    let query = `
+    console.log('Shifts GET hit, user:', req.user.id, 'week_start:', req.query.week_start);
+    try {
+        const { week_start } = req.query;
+        let query = `
         SELECT shifts.*, employees.name as employee_name, employees.role as employee_role
         FROM shifts
         JOIN employees ON shifts.employee_id = employees.id
         WHERE shifts.user_id = ?
         `;
-    let params = [req.user.id];
-    if (week_start) {
-        query += ' AND shifts.date >= ? AND shifts.date <= data(?, "+6 days")';
-        params.push(week_start, week_start);
+        let params = [req.user.id];
+        if (week_start) {
+            query += " AND shifts.date >= ? AND shifts.date <= date(?, '+6 days')";
+            params.push(week_start, week_start);
+        }
+        query += ' ORDER BY shifts.date, shifts.start_time';
+        const shifts = db.prepare(query).all(...params);
+        res.json(shifts);
+    } catch (err) {
+        console.error('Shifts GET error:', err.message);
+        res.status(500).json({ error: err.message });
     }
-    query += ' ORDER BY shifts.date, shifts.start_time';
-    const shifts = db.prepary(query).all(...params);
-    res.json(shifts);
 });
 
 router.post('/', authenticate, (req, res) => {
