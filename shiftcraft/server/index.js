@@ -15,6 +15,8 @@ const employeeRoutes = require('./routes/employees');
 app.use('/api/employees', employeeRoutes);
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+const shiftRoutes = require('./routes/shifts');
+app.use('/api/shifts', shiftRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'ShiftCraft server is running' });
