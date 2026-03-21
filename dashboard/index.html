@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lan="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+<head>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1040 50%, #0a1628 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: white;
+            padding: 24px;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 16px;
+        }
+
+        /* Hero Clock */
+        .hero {
+            text-align: center;
+            padding: 40px 24px;
+            margin-bottom: 20px;
+        }
+
+        #clock {
+            font-size: clamp(64px, 10vw, 96px);
+            font-weight: 200;
+            letter-spacing: -2px;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #date {
+            font-size: 18px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 8px;
+            font-weight: 300;
+        }
+
+        #location {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 4px;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+        }
+
+        .grid-bottom {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        /* Weather */
+        .weather-main {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        #weather-icon { font-size: 56px; }
+
+        #weather-temp {
+            font-size: 52px;
+            font-weight: 200;
+            line-height: 1;
+        }
+
+        #weather-desc {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 4px;
+            text-transform: capitalize;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .weather-detail {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .weather-detail-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .weather-detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Quote */
+        #quote-text {
+            font-size: 16px;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.4);
+            font-style: italic;
+        }
+
+        #quote-author {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 12px;
+        }
+
+        /* News */
+        .news-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .news-item:last-child { border-bottom: none; }
+
+        .news-item:hover { opacity: 0.75; }
+
+        .news-source {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4d9fff;
+            margin-bottom: 4px;
+        }
+
+        .news-headline {
+            font-size: 13px;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* ToDo */
+        .todo-input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .todo-input {
+            flex: 1;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        #todo-input::placeholder { color: rgba(255,255,255,0.3); }
+
+        #todo-input:focus {
+            border-color: rgba(77,159,255,0.5);
+            background: rgba(255,255,255,0.1);
+        }
+
+        #todo-add {
+            background: #4d9fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 18px;
+            transition: opacity 0.2s;
+        }
+
+        #todo-add:hover { opacity: 0.8; }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .todo-item:last-child { border-bottom: none; }
+
+        .todo-check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .todo-check.done {
+            background: #4d9fff;
+            border-color: #4d9fff;
+        }
+
+        .todo-check.done::after {
+            content: '✓';
+            font-size: 11px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+            transition: all 0.2s;
+        }
+
+        .todo-text.done {
+            text-decoration: line-through;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .todo-delete {
+            color: rgba(255,255,255,0.2);
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .todo-delete:hover {
+            color: #ff6584;
+        }
+
+        /* Prices */
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .price-item:last-child { border-bottom: none; }
+
+        .price-symbol {
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .price-name {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            margin-top: 2px;
+        }
+
+        .price-value {
+            text-align: right;
+        }
+
+        .price-amount {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .price-change {
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .up { color: #43C6AC; }
+        .down { color: #FF6584; }
+
+        /* Loading States */
+        .loading {
+            color: rgba(255,255,255,0.3);
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        /* Orbs for Background */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .orb1 {
+            width: 400px; height: 400px;
+            background: #4d9fff;
+            bottom: -100px; right: -100px;
+        }
+
+        .orb2 {
+            width: 400px; height: 400px;
+            background: #4d9fff;
+            bottom: -100px; left: -200px;
+        }
+
+        .orb3 {
+            width: 300px; height: 300px;
+            background: #ff6584;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%)
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orbs3"></div>
+
+    <div class="hero">
+        <div id="clock">00:00:00</div>
+        <div id="date">Loading...</div>
+        <div id="location">📍 Canton, Ohio</div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+            <div class="card-title"></div>🌤 Weather — Canton, OH </div>
+            <div class="weather-main">
+                <div id="weather-icon">⏳</div>
+                <div>
+                    <div id="weather-temp">--°F</div>
+                    <div id="weather-desc">Loading weather...</div>
+                </div>
+            </div>
+            <div class="weather-details">
+                <div class="weather-detail">
+                    <div class="weather-detail-label">Humidity</div>
+                    <div class="weather-detail-value" id="weather-humidity">--%</div>
+                </div>
+                <div class="weather-detail">
+                    <div class="weather-detail-label">Wind</div>
+                    <div class="weather-detail-value" id="weather-wind">-- mph</div>
+                </div>
+                <div class="weather-detail">
+                    <div class="weather-detail-label">Feels Like</div>
+                    <div class="weather-detail-value" id="weather-feels">--°F</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">💭 Quote of the Day</div>
+            <div id="quote-text" class="loading">Loading quote...</div>
+            <div id="quote-author"></div>
+        </div>
+    </div>
+
+    <div class="grid-bottom">
+
+        <div class="card">
+            <div class="card-title">📰 Headlines</div>
+            <div id="news-list" class="loading">Loading news...</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">✅ To-Do</div>
+            <div class="todo-input-row">
+                <input type="text" id="todo-input" placeholder="Add a task..." />
+                <button id="todo-add">+</button>
+            </div>
+            <div id="todo-list"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📈 Prices</div>
+            <div id="price-list" class="loading">Loading prices...</div>
+        </div>
+    </div>
+
+ <script>
+    // ── CLOCK ──
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('date').textContent =
+        `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ── WEATHER (Open-Meteo, no API key needed) ──
+    async function loadWeather() {
+      try {
+        // Canton, OH coordinates
+        const lat = 40.7989, lon = -81.3784;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const c = data.current;
+
+        const weatherIcons = {
+          0: '☀️', 1: '🌤', 2: '⛅', 3: '☁️',
+          45: '🌫', 48: '🌫', 51: '🌦', 53: '🌦', 55: '🌧',
+          61: '🌧', 63: '🌧', 65: '🌧', 71: '🌨', 73: '🌨',
+          75: '❄️', 80: '🌦', 81: '🌧', 82: '⛈', 95: '⛈'
+        };
+
+        const weatherDescs = {
+          0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+          45: 'Foggy', 48: 'Foggy', 51: 'Light drizzle', 53: 'Drizzle', 55: 'Heavy drizzle',
+          61: 'Slight rain', 63: 'Rain', 65: 'Heavy rain', 71: 'Light snow', 73: 'Snow',
+          75: 'Heavy snow', 80: 'Rain showers', 81: 'Rain showers', 82: 'Violent showers',
+          95: 'Thunderstorm'
+        };
+
+        const code = c.weather_code;
+        document.getElementById('weather-icon').textContent = weatherIcons[code] || '🌡';
+        document.getElementById('weather-temp').textContent = `${Math.round(c.temperature_2m)}°F`;
+        document.getElementById('weather-desc').textContent = weatherDescs[code] || 'Unknown';
+        document.getElementById('weather-humidity').textContent = `${c.relative_humidity_2m}%`;
+        document.getElementById('weather-wind').textContent = `${Math.round(c.wind_speed_10m)} mph`;
+        document.getElementById('weather-feels').textContent = `${Math.round(c.apparent_temperature)}°F`;
+      } catch(e) {
+        document.getElementById('weather-desc').textContent = 'Weather unavailable';
+      }
+    }
+    loadWeather();
+
+    // ── QUOTE ──
+    async function loadQuote() {
+      try {
+        const res = await fetch('https://api.quotable.io/random?maxLength=120');
+        const data = await res.json();
+        document.getElementById('quote-text').textContent = `"${data.content}"`;
+        document.getElementById('quote-author').textContent = `— ${data.author}`;
+      } catch(e) {
+        document.getElementById('quote-text').textContent = '"The secret of getting ahead is getting started."';
+        document.getElementById('quote-author').textContent = '— Mark Twain';
+      }
+    }
+    loadQuote();
+
+    // ── NEWS (RSS via allorigins proxy) ──
+    async function loadNews() {
+      const feeds = [
+        { url: 'https://feeds.bbci.co.uk/news/rss.xml', source: 'BBC' },
+        { url: 'https://hnrss.org/frontpage', source: 'HN' },
+      ];
+
+      const newsEl = document.getElementById('news-list');
+      newsEl.innerHTML = '';
+
+      for (const feed of feeds) {
+        try {
+          const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(feed.url)}`;
+          const res = await fetch(proxy);
+          const data = await res.json();
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(data.contents, 'text/xml');
+          const items = xml.querySelectorAll('item');
+
+          let count = 0;
+          items.forEach(item => {
+            if (count >= 4) return;
+            const title = item.querySelector('title')?.textContent;
+            const link = item.querySelector('link')?.textContent;
+            if (!title) return;
+
+            const el = document.createElement('div');
+            el.className = 'news-item';
+            el.innerHTML = `
+              <div class="news-source">${feed.source}</div>
+              <div class="news-headline">${title}</div>
+            `;
+            el.onclick = () => window.open(link, '_blank');
+            newsEl.appendChild(el);
+            count++;
+          });
+        } catch(e) {
+          console.log('News feed error:', e);
+        }
+      }
+
+      if (newsEl.children.length === 0) {
+        newsEl.innerHTML = '<div class="loading">Headlines unavailable</div>';
+      }
+    }
+    loadNews();
+
+    // ── TODO ──
+    let todos = JSON.parse(localStorage.getItem('dashboard-todos') || '[]');
+
+    function saveTodos() {
+      localStorage.setItem('dashboard-todos', JSON.stringify(todos));
+    }
+
+    function renderTodos() {
+      const list = document.getElementById('todo-list');
+      list.innerHTML = '';
+      todos.forEach((todo, i) => {
+        const el = document.createElement('div');
+        el.className = 'todo-item';
+        el.innerHTML = `
+          <div class="todo-check ${todo.done ? 'done' : ''}" onclick="toggleTodo(${i})"></div>
+          <div class="todo-text ${todo.done ? 'done' : ''}">${todo.text}</div>
+          <div class="todo-delete" onclick="deleteTodo(${i})">×</div>
+        `;
+        list.appendChild(el);
+      });
+    }
+
+    function addTodo() {
+      const input = document.getElementById('todo-input');
+      const text = input.value.trim();
+      if (!text) return;
+      todos.push({ text, done: false });
+      saveTodos();
+      renderTodos();
+      input.value = '';
+    }
+
+    function toggleTodo(i) {
+      todos[i].done = !todos[i].done;
+      saveTodos();
+      renderTodos();
+    }
+
+    function deleteTodo(i) {
+      todos.splice(i, 1);
+      saveTodos();
+      renderTodos();
+    }
+
+    document.getElementById('todo-add').onclick = addTodo;
+    document.getElementById('todo-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTodo();
+    });
+
+    renderTodos();
+
+    // ── PRICES (CoinGecko for crypto, Yahoo RSS for stocks) ──
+    async function loadPrices() {
+      const priceEl = document.getElementById('price-list');
+      priceEl.innerHTML = '';
+
+      // Crypto via CoinGecko
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true');
+        const data = await res.json();
+
+        const cryptos = [
+          { id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin' },
+          { id: 'ethereum', symbol: 'ETH', name: 'Ethereum' },
+        ];
+
+        cryptos.forEach(c => {
+          const price = data[c.id]?.usd;
+          const change = data[c.id]?.usd_24h_change;
+          if (!price) return;
+
+          const el = document.createElement('div');
+          el.className = 'price-item';
+          const changeClass = change >= 0 ? 'up' : 'down';
+          const changeStr = change >= 0 ? `+${change.toFixed(2)}%` : `${change.toFixed(2)}%`;
+          el.innerHTML = `
+            <div>
+              <div class="price-symbol">${c.symbol}</div>
+              <div class="price-name">${c.name}</div>
+            </div>
+            <div class="price-value">
+              <div class="price-amount">$${price.toLocaleString()}</div>
+              <div class="price-change ${changeClass}">${changeStr}</div>
+            </div>
+          `;
+          priceEl.appendChild(el);
+        });
+      } catch(e) {
+        console.log('Crypto error:', e);
+      }
+
+      // Stocks via Yahoo Finance RSS proxy
+      const stocks = [
+        { symbol: 'SPY', name: 'S&P 500' },
+        { symbol: 'TSLA', name: 'Tesla' },
+        { symbol: 'AAPL', name: 'Apple' },
+      ];
+
+      for (const stock of stocks) {
+        try {
+          const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${stock.symbol}?interval=1d&range=2d`)}`;
+          const res = await fetch(proxy);
+          const data = await res.json();
+          const json = JSON.parse(data.contents);
+          const result = json.chart.result[0];
+          const quotes = result.indicators.quote[0];
+          const closes = quotes.close.filter(Boolean);
+          const current = closes[closes.length - 1];
+          const prev = closes[closes.length - 2] || current;
+          const change = ((current - prev) / prev) * 100;
+
+          const el = document.createElement('div');
+          el.className = 'price-item';
+          const changeClass = change >= 0 ? 'up' : 'down';
+          const changeStr = change >= 0 ? `+${change.toFixed(2)}%` : `${change.toFixed(2)}%`;
+          el.innerHTML = `
+            <div>
+              <div class="price-symbol">${stock.symbol}</div>
+              <div class="price-name">${stock.name}</div>
+            </div>
+            <div class="price-value">
+              <div class="price-amount">$${current.toFixed(2)}</div>
+              <div class="price-change ${changeClass}">${changeStr}</div>
+            </div>
+          `;
+          priceEl.appendChild(el);
+        } catch(e) {
+          console.log(`Stock error for ${stock.symbol}:`, e);
+        }
+      }
+
+      if (priceEl.children.length === 0) {
+        priceEl.innerHTML = '<div class="loading">Prices unavailable</div>';
+      }
+    }
+    loadPrices();
+
+    // Refresh prices every 5 minutes
+    setInterval(loadPrices, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
