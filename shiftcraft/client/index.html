@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lan="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShiftCraft - Simple Scheduling for Small Teams</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* - HERO - */
+        .hero {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 24px
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1.5px;
+        }
+
+        .hero h1 span {
+            color: #93c5fd;
+        }
+
+        .hero p {
+            font-size: 18px;
+            opacity: 0.85;
+            max-width: 560px;
+            margin: 0 auto 36px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .btn-white:hover {
+            background: #f0f9ff;
+        }
+
+        .btn-outline-white {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+        }
+
+        .btn-outline-white:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .hero-note {
+            margin-top: 16px;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        /* - Social Proof - */
+        .social-proof {
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .proof-item {
+            text-align: center;
+        }
+
+        .proof-number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent);
+            display: block;
+        }
+
+        .proof-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* - Features - */
+        .features {
+            padding: 80px 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        .section-desc {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto 48px;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* - How it Works - */
+        .how-it-works {
+            background: #f8fafc;
+            padding: 80px 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));
+            gap: 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            margin: 0 auto 16px;
+        }
+
+        .step-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* - Pricing - */
+        .pricing {
+            padding: 80px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1ft 1fr;
+            gap: 24px;
+        }
+
+        .pricing-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
+            position: relative;
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .pricing-plan {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .pricing-price {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+        }
+
+        .pricing-price span {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .pricing-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pricing-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .pricing-features li {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pricing-feautres li::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* - CTA - */
+        .cta {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+        }
+
+        .cta p {
+            font-size: 16px;
+            opacity: 0.85;
+            margin-bottom: 32px;
+        }
+
+        /* - Footer - */
+        .footer {
+            background: #0f172a;
+            color: #64748b;
+            padding: 32px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-copy {
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Nav -->
+    <nav class="nav">
+        <span class="nav-logo">ShiftCraft</span>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How it works</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="auth.html">Sign In</a></li>
+        </ul>
+        <a href="auth.html" class="btn btn-primary">Get Started Free</a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">✦ Free for teams up to 5</div>
+        <h1>Scheduling that doesn't<br><span>waste your time</span></h1>
+        <p>ShiftCraft makes it easy to build weekly schedules, manage your team, and share shifts — in minutes, not
+            hours.</p>
+        <div class="hero-buttons">
+            <a href="auth.html" class="btn btn-white btn-lg" style="padding:12px 28px;font-size:15px">Start for free</a>
+            <a href="#how-it-works" class="btn btn-outline-white btn-lg" style="padding:12px 28px;font-size:15px">See
+                how it works</a>
+        </div>
+        <p class="hero-note">No credit card required. Free forever for small teams.</p>
+    </section>
+
+    <!-- Social Proof -->
+    <div class="social-proof">
+        <div class="proof-item">
+            <span class="proof-number">2 min</span>
+            <span class="proof-label">Average setup time</span>
+        </div>
+        <div class="proof-item">
+            <span class="proof-number">100%</span>
+            <span class="proof-label">Free for 5 employees</span>
+        </div>
+        <div class="proof-item">
+            <span class="proof-number">0</span>
+            <span class="proof-label">Spreadsheets needed</span>
+        </div>
+        <div class="proof-item">
+            <span class="proof-number">∞</span>
+            <span class="proof-label">Hours saved per month</span>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <p class="section-label">Features</p>
+        <h2 class="section-title">Everything you need. Nothing you don't.</h2>
+        <p class="section-desc">Built for small businesses that need simple, reliable scheduling — not enterprise
+            software bloat.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">📅</span>
+                <h3 class="feature-title">Weekly Schedule View</h3>
+                <p class="feature-desc">See your whole team's week at a glance. Click any cell to add a shift in
+                    seconds.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">👥</span>
+                <h3 class="feature-title">Employee Management</h3>
+                <p class="feature-desc">Add your team, assign roles, and manage everyone from one simple dashboard.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">⚡</span>
+                <h3 class="feature-title">Built for Speed</h3>
+                <p class="feature-desc">No training required. If you can use a calendar, you can use ShiftCraft.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🔒</span>
+                <h3 class="feature-title">Secure by Default</h3>
+                <p class="feature-desc">Your schedule data is private to your account. No one else can see your
+                    business.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">💰</span>
+                <h3 class="feature-title">Free to Start</h3>
+                <p class="feature-desc">Up to 5 employees completely free. Upgrade only when your team grows.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">📱</span>
+                <h3 class="feature-title">Works Everywhere</h3>
+                <p class="feature-desc">Runs in any browser on any device. No app to download, no updates to install.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="how-it-works" id="how-it-works">
+        <p class="section-label">How it works</p>
+        <h2 class="section-title">Up and running in minutes</h2>
+        <p class="section-desc" style="margin-bottom:48px">Three steps and you're scheduling.</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Create your account</h3>
+                <p class="step-desc">Sign up free with your email. No credit card, no commitment.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Add your team</h3>
+                <p class="step-desc">Add employees with their name and role. Takes about 30 seconds.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Build your schedule</h3>
+                <p class="step-desc">Click any cell on the calendar to assign shifts. Done.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <p class="section-label">Pricing</p>
+        <h2 class="section-title">Simple, honest pricing</h2>
+        <p class="section-desc">Start free. Upgrade when you're ready.</p>
+
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <p class="pricing-plan">Free</p>
+                <div class="pricing-price">$0<span>/month</span></div>
+                <p class="pricing-desc">Perfect for small teams just getting started.</p>
+                <ul class="pricing-features">
+                    <li>Up to 5 employees</li>
+                    <li>Weekly schedule view</li>
+                    <li>Unlimited shifts</li>
+                    <li>Secure account</li>
+                </ul>
+                <a href="auth.html" class="btn btn-secondary btn-full">Get started free</a>
+            </div>
+
+            <div class="pricing-card featured">
+                <div class="pricing-badge">Most Popular</div>
+                <p class="pricing-plan">Pro</p>
+                <div class="pricing-price">$9<span>/month</span></div>
+                <p class="pricing-desc">For growing teams that need more power.</p>
+                <ul class="pricing-features">
+                    <li>Unlimited employees</li>
+                    <li>Weekly schedule view</li>
+                    <li>Unlimited shifts</li>
+                    <li>PDF export</li>
+                    <li>Email notifications</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="auth.html" class="btn btn-primary btn-full">Start free trial</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <h2>Ready to ditch the spreadsheet?</h2>
+        <p>Join thousands of small businesses scheduling smarter with ShiftCraft.</p>
+        <a href="auth.html" class="btn btn-white" style="padding:14px 32px;font-size:15px;font-weight:700">
+            Get started for free →
+        </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <span class="footer-logo">ShiftCraft</span>
+        <div class="footer-links">
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="auth.html">Sign In</a>
+        </div>
+        <span class="footer-copy">© 2026 ShiftCraft. Built by Cole Hall.</span>
+    </footer>
+</body>
+
+</html>
