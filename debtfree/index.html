@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DebtFree — Debt Payoff Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --accent: #6366f1;
+            --accent-light: #eef2ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --avalanche: #6366f1;
+            --snowball: #10b981;
+            --minimum: #94a3b8;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* ── Header ── */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--text);
+        }
+
+        .header-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ── Layout ── */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ── Form ── */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            background: white;
+        }
+
+        .input-prefix {
+            position: relative;
+        }
+
+        .input-prefix span {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .input-prefix input {
+            padding-left: 26px;
+        }
+
+        .input-suffix {
+            position: relative;
+        }
+
+        .input-suffix span {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .input-suffix input {
+            padding-right: 36px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            border-radius: 12px;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg);
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn-add {
+            background: var(--accent-light);
+            color: var(--accent);
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .btn-add:hover {
+            background: #e0e7ff;
+        }
+
+        /* ── Debt Items ── */
+        .debt-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .debt-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .debt-item-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* ── Extra Payment Slider ── */
+        .extra-payment-display {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent);
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            padding: 0;
+            border: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+        }
+
+        /* ── Strategy Comparison ── */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .strategy-card {
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .strategy-card.avalanche {
+            border-color: var(--avalanche);
+            background: #eef2ff;
+        }
+
+        .strategy-card.snowball {
+            border-color: var(--snowball);
+            background: #ecfdf5;
+        }
+
+        .strategy-card.minimum {
+            border-color: var(--minimum);
+            background: #f8fafc;
+        }
+
+        .strategy-name {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .strategy-card.avalanche .strategy-name {
+            color: var(--avalanche);
+        }
+
+        .strategy-card.snowball .strategy-name {
+            color: var(--snowball);
+        }
+
+        .strategy-card.minimum .strategy-name {
+            color: var(--minimum);
+        }
+
+        .strategy-date {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .strategy-interest {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .strategy-savings {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-block;
+        }
+
+        .strategy-card.avalanche .strategy-savings {
+            background: var(--avalanche);
+            color: white;
+        }
+
+        .strategy-card.snowball .strategy-savings {
+            background: var(--snowball);
+            color: white;
+        }
+
+        /* ── Chart ── */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 24px;
+        }
+
+        /* ── Schedule Table ── */
+        .schedule-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .schedule-tab {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: var(--bg);
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .schedule-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .schedule-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: var(--bg);
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .schedule-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .schedule-table tr:hover td {
+            background: var(--bg);
+        }
+
+        .table-wrap {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ── Legend ── */
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .strategy-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            header {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">Debt<span>Free</span></div>
+        <div class="header-sub">See exactly when you'll be debt free</div>
+    </header>
+
+    <div class="container">
+        <div class="layout">
+
+            <!-- LEFT: Input Panel -->
+            <div>
+
+                <!-- Debts -->
+                <div class="card">
+                    <div class="card-title">💳 Your Debts</div>
+                    <div id="debt-list"></div>
+                    <button class="btn btn-add" onclick="addDebt()">+ Add a Debt</button>
+                </div>
+
+                <!-- Extra Payment -->
+                <div class="card">
+                    <div class="card-title">⚡ Extra Monthly Payment</div>
+                    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+                        How much extra can you put toward debt each month, on top of minimums?
+                    </p>
+                    <div class="extra-payment-display" id="extra-display">$0/mo</div>
+                    <input type="range" id="extra-slider" min="0" max="1000" step="25" value="0"
+                        oninput="updateExtra(this.value)" />
+                    <div
+                        style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:6px">
+                        <span>$0</span><span>$250</span><span>$500</span><span>$750</span><span>$1,000</span>
+                    </div>
+                    <div class="form-group" style="margin-top:16px">
+                        <label>Or type an amount</label>
+                        <div class="input-prefix">
+                            <span>$</span>
+                            <input type="number" id="extra-input" value="0" min="0"
+                                oninput="updateExtraFromInput(this.value)" placeholder="0" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculate -->
+                <button class="btn btn-primary" onclick="calculate()">📊 Calculate Payoff Plan</button>
+
+            </div>
+
+            <!-- RIGHT: Results Panel -->
+            <div id="results">
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <h3>Add your debts to get started</h3>
+                    <p>Enter your debts on the left, set an extra payment amount, and see exactly when you'll be debt
+                        free.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let debts = [];
+        let chartInstance = null;
+        let activeTab = 'avalanche';
+
+        function checkDebtWarnings(debt) {
+            const balance = parseFloat(debt.balance);
+            const rate = parseFloat(debt.rate) / 100 / 12;
+            const minimum = parseFloat(debt.minimum);
+
+            if (!balance || !rate || !minimum) return null;
+
+            const monthlyInterest = balance * rate;
+
+            if (minimum <= monthlyInterest) {
+                return `⚠️ Your $${Math.round(minimum)} minimum doesn't cover the $${Math.round(monthlyInterest)} monthly interest — this debt will never be paid off.`;
+            }
+
+            return null;
+        }
+
+
+
+        // ── Debt Management ──
+        function addDebt(preset = {}) {
+            const id = Date.now();
+            debts.push({
+                id,
+                name: preset.name || '',
+                balance: preset.balance || '',
+                rate: preset.rate || '',
+                minimum: preset.minimum || '',
+            });
+            renderDebtList();
+        }
+
+        function removeDebt(id) {
+            debts = debts.filter(d => d.id !== id);
+            renderDebtList();
+        }
+
+        function renderDebtList() {
+            const list = document.getElementById('debt-list');
+            if (debts.length === 0) {
+                list.innerHTML = `<p style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:16px">No debts added yet.</p>`;
+                return;
+            }
+
+            list.innerHTML = debts.map(debt => `
+      <div class="debt-item">
+        <div class="debt-item-header">
+          <input
+            type="text"
+            placeholder="Debt name (e.g. Visa Card)"
+            value="${debt.name}"
+            style="font-weight:700;background:transparent;border:none;outline:none;font-size:14px;padding:0;width:100%"
+            oninput="updateDebt(${debt.id}, 'name', this.value)"
+          />
+          <button class="btn btn-ghost" onclick="removeDebt(${debt.id})">Remove</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Balance</label>
+            <div class="input-prefix">
+              <span>$</span>
+              <input type="number" placeholder="5,000" value="${debt.balance}"
+                oninput="updateDebt(${debt.id}, 'balance', this.value)" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Interest Rate</label>
+            <div class="input-suffix">
+              <span>%</span>
+              <input type="number" placeholder="19.9" value="${debt.rate}" step="0.1"
+                oninput="updateDebt(${debt.id}, 'rate', this.value)" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+  <label>Minimum Monthly Payment</label>
+  <div class="input-prefix">
+    <span>$</span>
+    <input type="number" placeholder="150" value="${debt.minimum}"
+      oninput="updateDebt(${debt.id}, 'minimum', this.value); renderDebtList()" />
+  </div>
+  ${checkDebtWarnings(debt) ? `
+    <div style="margin-top:8px;padding:10px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:12px;color:#991b1b;line-height:1.5">
+      ${checkDebtWarnings(debt)}
+    </div>
+  ` : ''}
+</div>
+      </div>
+    `).join('');
+        }
+
+        function updateDebt(id, field, value) {
+            const debt = debts.find(d => d.id === id);
+            if (debt) debt[field] = value;
+        }
+
+        // ── Extra Payment ──
+        function updateExtra(val) {
+            document.getElementById('extra-display').textContent = `$${Number(val).toLocaleString()}/mo`;
+            document.getElementById('extra-input').value = val;
+        }
+
+        function updateExtraFromInput(val) {
+            const clamped = Math.max(0, Math.min(1000, Number(val)));
+            document.getElementById('extra-slider').value = clamped;
+            document.getElementById('extra-display').textContent = `$${Number(val).toLocaleString()}/mo`;
+        }
+
+        // ── Payoff Calculator ──
+        function simulatePayoff(debtList, extra, strategy) {
+            // Deep copy debts
+            let debts = debtList.map(d => ({
+                name: d.name || 'Unnamed',
+                balance: parseFloat(d.balance),
+                rate: parseFloat(d.rate) / 100 / 12,
+                minimum: parseFloat(d.minimum),
+            }));
+
+            // Sort by strategy
+            if (strategy === 'avalanche') {
+                debts.sort((a, b) => b.rate - a.rate);
+            } else if (strategy === 'snowball') {
+                debts.sort((a, b) => a.balance - b.balance);
+            }
+
+            let totalInterest = 0;
+            let month = 0;
+            let history = [];
+            const maxMonths = 600;
+
+            while (debts.some(d => d.balance > 0) && month < maxMonths) {
+                month++;
+                let extraLeft = extra;
+
+                // Apply interest and minimums
+                debts.forEach(d => {
+                    if (d.balance <= 0) return;
+                    const interest = d.balance * d.rate;
+                    totalInterest += interest;
+                    d.balance += interest;
+                    const payment = Math.min(d.minimum, d.balance);
+                    d.balance -= payment;
+                    d.balance = Math.max(0, d.balance);
+                });
+
+                // Apply extra to first non-zero debt
+                for (let d of debts) {
+                    if (d.balance <= 0) continue;
+                    const payment = Math.min(extraLeft, d.balance);
+                    d.balance -= payment;
+                    d.balance = Math.max(0, d.balance);
+                    extraLeft -= payment;
+                    if (extraLeft <= 0) break;
+                }
+
+                // Record total balance this month
+                history.push(debts.reduce((sum, d) => sum + Math.max(0, d.balance), 0));
+            }
+
+            return { months: month, totalInterest, history };
+        }
+
+        function simulateMinimum(debtList) {
+            let debts = debtList.map(d => ({
+                balance: parseFloat(d.balance),
+                rate: parseFloat(d.rate) / 100 / 12,
+                minimum: parseFloat(d.minimum),
+            }));
+
+            let totalInterest = 0;
+            let month = 0;
+            let history = [];
+            const maxMonths = 600;
+
+            while (debts.some(d => d.balance > 0) && month < maxMonths) {
+                month++;
+                debts.forEach(d => {
+                    if (d.balance <= 0) return;
+                    const interest = d.balance * d.rate;
+                    totalInterest += interest;
+                    d.balance += interest;
+
+                    // Minimum payment (2% of balance or $25, whichever is higher — common credit card rule)
+                    const minPayment = Math.max(d.minimum, d.balance * 0.02);
+                    const payment = Math.min(minPayment, d.balance);
+                    d.balance -= payment;
+                    d.balance = Math.max(0, d.balance);
+                });
+
+                history.push(debts.reduce((sum, d) => sum + Math.max(0, d.balance), 0));
+            }
+
+            return { months: month, totalInterest, history };
+        }
+
+        function monthsToDate(months) {
+            const d = new Date();
+            d.setMonth(d.getMonth() + months);
+            return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        }
+
+        function getSchedule(debtList, extra, strategy) {
+            let debts = debtList.map(d => ({
+                name: d.name || 'Unnamed',
+                balance: parseFloat(d.balance),
+                rate: parseFloat(d.rate) / 100 / 12,
+                minimum: parseFloat(d.minimum),
+            }));
+
+            if (strategy === 'avalanche') debts.sort((a, b) => b.rate - a.rate);
+            else if (strategy === 'snowball') debts.sort((a, b) => a.balance - b.balance);
+
+            let schedule = [];
+            let month = 0;
+            const maxMonths = 600;
+
+            while (debts.some(d => d.balance > 0) && month < maxMonths) {
+                month++;
+                let extraLeft = extra;
+                let monthInterest = 0;
+                let monthPayment = 0;
+                let totalBalance = 0;
+
+                debts.forEach(d => {
+                    if (d.balance <= 0) return;
+                    const interest = d.balance * d.rate;
+                    monthInterest += interest;
+                    d.balance += interest;
+                    const payment = Math.min(d.minimum, d.balance);
+                    monthPayment += payment;
+                    d.balance -= payment;
+                    d.balance = Math.max(0, d.balance);
+                });
+
+                for (let d of debts) {
+                    if (d.balance <= 0) continue;
+                    const payment = Math.min(extraLeft, d.balance);
+                    d.balance -= payment;
+                    monthPayment += payment;
+                    extraLeft -= payment;
+                    if (extraLeft <= 0) break;
+                }
+
+                totalBalance = debts.reduce((sum, d) => sum + Math.max(0, d.balance), 0);
+
+                schedule.push({
+                    month,
+                    date: monthsToDate(month),
+                    payment: monthPayment,
+                    interest: monthInterest,
+                    balance: totalBalance,
+                });
+            }
+
+            return schedule;
+        }
+
+        // ── Main Calculate ──
+        function calculate() {
+            const validDebts = debts.filter(d =>
+                d.balance && d.rate && d.minimum &&
+                !isNaN(d.balance) && !isNaN(d.rate) && !isNaN(d.minimum)
+            );
+
+            if (validDebts.length === 0) {
+                alert('Please add at least one debt with balance, interest rate, and minimum payment.');
+                return;
+            }
+
+            const extra = parseFloat(document.getElementById('extra-input').value) || 0;
+            const totalBalance = validDebts.reduce((s, d) => s + parseFloat(d.balance), 0);
+
+            const avalanche = simulatePayoff(validDebts, extra, 'avalanche');
+            const snowball = simulatePayoff(validDebts, extra, 'snowball');
+            const minimum = simulateMinimum(validDebts);
+
+            renderResults(validDebts, extra, avalanche, snowball, minimum, totalBalance);
+        }
+
+        function renderResults(validDebts, extra, avalanche, snowball, minimum, totalBalance) {
+            const resultsEl = document.getElementById('results');
+
+            resultsEl.innerHTML = `
+      <!-- Strategy Comparison -->
+      <div class="card">
+        <div class="card-title">🏆 Strategy Comparison</div>
+        <div class="strategy-grid">
+          <div class="strategy-card avalanche">
+            <div class="strategy-name">⬆️ Avalanche</div>
+            <div class="strategy-date">${monthsToDate(avalanche.months)}</div>
+            <div class="strategy-interest">$${Math.round(avalanche.totalInterest).toLocaleString()} interest</div>
+            ${avalanche.totalInterest < minimum.totalInterest
+                    ? `<div class="strategy-savings">Saves $${Math.round(minimum.totalInterest - avalanche.totalInterest).toLocaleString()}</div>`
+                    : ''}
+          </div>
+          <div class="strategy-card snowball">
+            <div class="strategy-name">⛄ Snowball</div>
+            <div class="strategy-date">${monthsToDate(snowball.months)}</div>
+            <div class="strategy-interest">$${Math.round(snowball.totalInterest).toLocaleString()} interest</div>
+            ${snowball.totalInterest < minimum.totalInterest
+                    ? `<div class="strategy-savings">Saves $${Math.round(minimum.totalInterest - snowball.totalInterest).toLocaleString()}</div>`
+                    : ''}
+          </div>
+          <div class="strategy-card minimum">
+            <div class="strategy-name">💤 Minimums Only</div>
+            <div class="strategy-date">${monthsToDate(minimum.months)}</div>
+            <div class="strategy-interest">$${Math.round(minimum.totalInterest).toLocaleString()} interest</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px">Baseline comparison</div>
+          </div>
+        </div>
+
+        ${extra === 0 ? `
+          <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:10px;padding:14px;font-size:13px;color:#92400e;text-align:center">
+            💡 Try adding an extra monthly payment — even $50/mo can save thousands in interest!
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- Chart -->
+      <div class="card">
+        <div class="card-title">📈 Balance Over Time</div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--avalanche)"></div>
+            <span>Avalanche</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--snowball)"></div>
+            <span>Snowball</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--minimum)"></div>
+            <span>Minimum Only</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="payoff-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="card">
+        <div class="card-title">📅 Month by Month Schedule</div>
+        <div class="schedule-tabs">
+          <button class="schedule-tab active" onclick="switchTab('avalanche', this)">⬆️ Avalanche</button>
+          <button class="schedule-tab" onclick="switchTab('snowball', this)">⛄ Snowball</button>
+          <button class="schedule-tab" onclick="switchTab('minimum', this)">💤 Minimum</button>
+        </div>
+        <div id="schedule-content"></div>
+      </div>
+    `;
+
+            // Store for tab switching
+            window._schedules = {
+                avalanche: getSchedule(validDebts, extra, 'avalanche'),
+                snowball: getSchedule(validDebts, extra, 'snowball'),
+                minimum: getSchedule(validDebts, 0, 'minimum'),
+            };
+
+            renderScheduleTable('avalanche');
+            renderChart(avalanche, snowball, minimum, totalBalance);
+        }
+
+        function renderChart(avalanche, snowball, minimum, totalBalance) {
+            if (chartInstance) chartInstance.destroy();
+
+            const maxLen = Math.max(avalanche.history.length, snowball.history.length, minimum.history.length);
+            const labels = Array.from({ length: maxLen }, (_, i) => {
+                if (i % 12 === 0) return `Year ${Math.floor(i / 12) + 1}`;
+                return '';
+            });
+
+            const pad = (arr, len) => {
+                const padded = [...arr];
+                while (padded.length < len) padded.push(0);
+                return padded;
+            };
+
+            const ctx = document.getElementById('payoff-chart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Avalanche',
+                            data: pad(avalanche.history, maxLen),
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99,102,241,0.08)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 2.5,
+                        },
+                        {
+                            label: 'Snowball',
+                            data: pad(snowball.history, maxLen),
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16,185,129,0.06)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 2.5,
+                        },
+                        {
+                            label: 'Minimum Only',
+                            data: pad(minimum.history, maxLen),
+                            borderColor: '#94a3b8',
+                            backgroundColor: 'rgba(148,163,184,0.06)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}`,
+                            },
+                        },
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { size: 11 } },
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 11 },
+                                callback: val => `$${val.toLocaleString()}`,
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
+        function switchTab(strategy, btn) {
+            document.querySelectorAll('.schedule-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            activeTab = strategy;
+            renderScheduleTable(strategy);
+        }
+
+        function renderScheduleTable(strategy) {
+            const schedule = window._schedules?.[strategy];
+            if (!schedule) return;
+
+            const content = document.getElementById('schedule-content');
+            content.innerHTML = `
+      <div class="table-wrap">
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Date</th>
+              <th>Payment</th>
+              <th>Interest</th>
+              <th>Remaining Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${schedule.map(row => `
+              <tr>
+                <td style="color:var(--text-muted)">${row.month}</td>
+                <td>${row.date}</td>
+                <td style="color:var(--success);font-weight:600">$${Math.round(row.payment).toLocaleString()}</td>
+                <td style="color:var(--danger)">$${Math.round(row.interest).toLocaleString()}</td>
+                <td style="font-weight:600">$${Math.round(row.balance).toLocaleString()}</td>
+              </tr>
+            `).join('')}
+            <tr style="background:var(--bg)">
+              <td colspan="5" style="text-align:center;padding:16px;color:var(--success);font-weight:700">
+                🎉 Debt Free!
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+        }
+
+        // ── Init with sample debt ──
+        addDebt({ name: 'Credit Card', balance: '5000', rate: '19.9', minimum: '150' });
+        addDebt({ name: 'Car Loan', balance: '12000', rate: '6.5', minimum: '250' });
+    </script>
+
+</body>
+
+</html>
