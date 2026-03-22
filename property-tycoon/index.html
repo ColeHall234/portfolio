@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lan="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Tycoon</title>
+</head>
+
+<body>
+
+    <h1>Property Tycoon</h1>
+    <p id="money-display">$500</p>
+    <p id="helper-display">Helpers: 0</p>
+    <p id="income-display">$0/sec</p>
+    <button id="click-btn">Do a Job</button>
+    <button id="helper-btn">Hire Helper - $50</button>
+
+    <h2>Properties</h2>
+    <div id="property-list"></div>
+
+    <script>
+        let money = 500;
+        let moneyPerClick = 5;
+        let passiveIncome = 0;
+        let totalEarned = 0;
+        let helpers = 0;
+        let helperCost = 50;
+
+        const properties = [
+            {
+                id: 0,
+                name: 'Rundown Shack',
+                emoji: '🏚️',
+                cost: 200,
+                renovationCost: 100,
+                renovated: false,
+                owned: false,
+                rentPerSec: 2,
+                sellValue: 500
+            },
+
+            {
+                id: 1,
+                name: 'Old Duplex',
+                emoji: '🏠',
+                cost: 800,
+                renovationCost: 300,
+                renovated: false,
+                owned: false,
+                rentPerSec: 6,
+                sellValue: 1800
+            },
+
+            {
+                id: 3,
+                name: 'Small Apartment',
+                emoji: '🏢',
+                cost: 2500,
+                renovationCost: 800,
+                renovated: false,
+                owned: false,
+                rentPerSec: 15,
+                sellValue: 5500
+            }
+        ]
+
+        const moneyDisplay = document.getElementById('money-display');
+        const clickBtn = document.getElementById('click-btn');
+
+        clickBtn.addEventListener('click', function () {
+            money += moneyPerClick;
+            totalEarned += moneyPerClick;
+            moneyDisplay.textContent = '$' + money.toLocaleString();
+            updateHelperBtn();
+        });
+
+        const helperBtn = document.getElementById('helper-btn');
+        const helperDisplay = document.getElementById('helper-display');
+
+        helperBtn.addEventListener('click', function () {
+            if (money >= helperCost) {
+                money -= helperCost;
+                helpers += 1;
+                passiveIncome += 1;
+                helperCost = Math.round(helperCost * 1.25);
+                helperDisplay.textContent = 'Helpers: ' + helpers;
+                moneyDisplay.textContent = '$' + money.toLocaleString();
+                updateHelperBtn();
+            }
+        });
+
+        function updateHelperBtn() {
+            helperBtn.textContent = 'Hire Helper - $' + helperCost.toLocaleString();
+            helperBtn.disabled = money < helperCost;
+            document.getElementById('income-display').textContent = '$' + passiveIncome + '/sec';
+        }
+
+        setInterval(function () {
+            if (passiveIncome > 0) {
+                money += passiveIncome;
+                totalEarned += passiveIncome;
+                moneyDisplay.textContent = '$' + money.toLocaleString();
+                updateHelperBtn();
+                renderProperties();
+            }
+        }, 1000);
+
+        function renderProperties() {
+            const list = document.getElementById('property-list');
+            list.innerHTML = '';
+
+            properties.forEach(function (p) {
+                const div = document.createElement('div');
+
+                if (!p.owned) {
+                    div.innerHTML = `
+        <p>${p.emoji} ${p.name} — $${p.cost.toLocaleString()}</p>
+        <button onclick="buyProperty(${p.id})" ${money < p.cost ? 'disabled' : ''}>
+          Buy
+        </button>
+      `;
+                } else if (!p.renovated) {
+                    div.innerHTML = `
+        <p>${p.emoji} ${p.name} — Needs renovation ($${p.renovationCost.toLocaleString()})</p>
+        <button onclick="renovateProperty(${p.id})" ${money < p.renovationCost ? 'disabled' : ''}>
+          Renovate
+        </button>
+      `;
+                } else {
+                    div.innerHTML = `
+        <p>${p.emoji} ${p.name} — Earning $${p.rentPerSec}/sec</p>
+        <button onclick="sellProperty(${p.id})">
+          Sell for $${p.sellValue.toLocaleString()}
+        </button>
+      `;
+                }
+
+                list.appendChild(div);
+            });
+        }
+
+        function buyProperty(id) {
+            const p = properties[id];
+            if (money >= p.cost) {
+                money -= p.cost;
+                p.owned = true;
+                renderProperties();
+                updateHelperBtn();
+            }
+        }
+
+        function renovateProperty(id) {
+            const p = properties[id];
+            if (money >= p.renovationCost) {
+                money -= p.renovationCost;
+                p.renovated = true;
+                passiveIncome += p.rentPerSec;
+                renderProperties();
+                updateHelperBtn();
+            }
+        }
+
+        function sellProperty(id) {
+            const p = properties[id];
+            money += p.sellValue;
+            totalEarned += p.sellValue;
+            passiveIncome -= p.rentPerSec;
+            p.owned = false;
+            p.renovated = false;
+            renderProperties();
+            updateHelperBtn();
+        }
+    </script>
+</body>
+
+</html>
