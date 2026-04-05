@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Archetype Mirror</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --black: #0a0908;
+            --deep: #110f0e;
+            --surface: #181614;
+            --border: #2e2820;
+            --gold: #c9a84c;
+            --gold-dim: #7a6230;
+            --gold-pale: #e8d5a3;
+            --text: #d4c9b0;
+            --text-dim: #7a7060;
+            --text-faint: #3a3428;
+            --serif: 'Cinzel', serif;
+            --body: 'EB Garamond', serif;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            min-height: 100vh;
+            background: var(--black);
+            color: var(--text);
+            font-family: var(--body);
+            font-size: 18px;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.35;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 40%, #000 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Landing */
+        #screen-landing {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .eye-symbol {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 2.5rem;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 0.2s;
+        }
+
+        .landing-title {
+            font-family: var(--serif);
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 400;
+            color: var(--gold-pale);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 0.5s;
+            margin-bottom: 0.5rem;
+        }
+
+        .landing-sub {
+            font-family: var(--serif);
+            font-size: 0.7rem;
+            letter-spacing: 0.4rem;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 0.8s;
+            margin-bottom: 2.5rem;
+        }
+
+        .landing-divider {
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+            margin: 0 auto 2.5rem;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 1s;
+        }
+
+        .landing-desc {
+            font-size: 1rem;
+            color: var(--text-dim);
+            max-width: 480px;
+            line-height: 1.9;
+            font-style: italic;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 1.2s;
+            margin-bottom: 3rem;
+        }
+
+        .entry-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+            width: 100%;
+            max-width: 360px;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 1.5s;
+        }
+
+        .field-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .field-label {
+            font-family: var(--sarif);
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+        }
+
+        .ritual-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: var(--gold-pale);
+            font-family: var(--body);
+            font-size: 1.1rem;
+            padding: 0.6rem 0;
+            outline: none;
+            transition: border-color 0.3s;
+            text-align: center;
+            letter-spacing: 0.05em;
+        }
+
+        .ritual-input::placeholder {
+            color: var(--text-faint);
+        }
+
+        .ritual-input::focus {
+            border-bottom-color: var(--gold-dim);
+        }
+
+        .btn-enter {
+            margin-top: 0.75rem;
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            font-family: var(--serif);
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            padding: 1rem 2.5rem;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+            position: relative;
+        }
+
+        .btn-enter::before,
+        .btn-enter::after {
+            content: '✦';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.5rem;
+            color: var(--gold-dim);
+            transition: color 0.3s;
+        }
+
+        .btn-enter::before {
+            left: 1rem;
+        }
+
+        .btn-enter::after {
+            right: 1rem;
+        }
+
+        .btn-enter:hover {
+            background: rgba(201, 168, 76, 0.08);
+            border-color: var(--gold);
+            color: var(--gold-pale);
+        }
+
+        .btn-enter:hover::before,
+        .btn-enter:hover::after {
+            color: var(--gold);
+        }
+
+        /* Questions */
+        #screen-questions {
+            flex-direction: column;
+            align-items: Center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            min-height: 100vh;
+        }
+
+        .q-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .q-name {
+            font-family: var(--serif);
+            font-size: 0.6rem;
+            letter-spacing: 0.35em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .q-progress-track {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .q-pip {
+            width: 28px;
+            height: 1px;
+            background: var(--border);
+            transition: background 0.5s;
+        }
+
+        .q-pip.done {
+            background: var(--gold-dim);
+        }
+
+        .q-pip.active {
+            background: var(--gold);
+        }
+
+        .q-card {
+            width: 100%;
+            max-width: 580px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .q-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .q-number {
+            font-family: var(--serif);
+            font-size: 0.55rem;
+            letter-spacing: 0.4em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .q-symbol {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            filter: sepia(1) hue-rotat(10deg) saturate(0.6) brightness(0.9);
+        }
+
+        .q-text {
+            font-family: var(--body);
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+
+        .q-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 2.5rem;
+        }
+
+        .q-choice {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: var(--body);
+            font-size: 0.95rem;
+            font-style: italic;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            text-align: left;
+            line-height: 1.5;
+            transition: border-color 0.25s, color 0.25s, background 0.25s;
+            position: relative;
+        }
+
+        .q-choice::before {
+            content: attr(data-letter);
+            display: block;
+            font-family: var(--serif);
+            font-style: normal;
+            font-size: 0.55rem;
+            letter-spacing: 0.2em;
+            color: var(--gold-dim);
+            margin-bottom: 0.4rem;
+        }
+
+        .q-choice:hover {
+            border-color: var(--gold-dim);
+            color: var(--gold-pale);
+            background: rgba(201, 168, 76, 0.04);
+        }
+
+        .q-choice.selected {
+            border-color: var(--gold);
+            color: var(--gold-pale);
+            background: rgba(201, 168, 76, 0.07);
+        }
+
+        .q-choice.selected::after {
+            content: '✦';
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            font-size: 0.5rem;
+            color: var(--gold);
+        }
+
+        .btn-next {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-faint);
+            font-family: var(--serif);
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            padding: 0.8rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .btn-next.ready {
+            pointer-events: all;
+            border-color: var(--gold-dim);
+            color: var(--gold);
+        }
+
+        .btn-next.ready:hover {
+            background: rgba(201, 168, 76, 0.08);
+            border-color: var(--gold);
+            color: var(--gold-pale);
+        }
+
+        /* THRESHOLD */
+        #screen-threshold {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .threshold-glyph {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            animation: slowSpin 20s linear infinite;
+        }
+
+        .threshold-title {
+            font-family: var(--serif);
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            font-weight: 400;
+            color: var(--gold-pale);
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .threshold-sub {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--text-dim);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slowSpin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+        }
+
+        /* RESULTS */
+        #screen-results {
+            flex-direction: column;
+            align-items: center;
+            padding: 4rem 2rem;
+            min-height: 100vh;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 0.2s;
+        }
+
+        .results-name {
+            font-family: var(--serif);
+            font-size: 0.6rem;
+            letter-spacing: 0.4em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .results-title {
+            font-family: var(--serif);
+            font-size: clamp(1.6rem, 5vw, 2.8rem);
+            font-weight: 400;
+            color: var(--gold-pale);
+            letter-spacing: 0.12em;
+            margin-bottom: 0.5rem;
+        }
+
+        .results-triad {
+            font-family: var(--serif);
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+        }
+
+        .results-divider {
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+            margin: 2rem auto;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 0.4s;
+        }
+
+        .results-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 900px;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 0.6s;
+        }
+
+        @media (max-width: 680px) {
+            .results-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sigil-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .sigil-frame {
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 1;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .sigil-frame svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .sigil-label {
+            font-family: var(--serif);
+            font-size: 0.55rem;
+            letter-spacing: 0.3em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .btn-download {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: var(--serif);
+            font-size: 0.55rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-download:hover {
+            border-color: var(--gold-dim);
+            color: var(--gold);
+        }
+
+        .reading-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .reading-section {
+            border-left: 1px solid var(--border);
+            padding-left: 1.5rem;
+        }
+
+        .reading-section-label {
+            font-family: var(--serif);
+            font-size: 0.55rem;
+            letter-spacing: 0.3em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .reading-section-title {
+            font-family: var(--serif);
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--gold-pale);
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+        }
+
+        .reading-section-text {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            line-height: 1.9;
+            font-style: italic;
+        }
+
+        .reading-synthesis {
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            font-size: 1rem;
+            color: var(--text);
+            line-height: 2;
+            font-style: italic;
+        }
+
+        .btn-restart {
+            margin-top: 3rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: var(--serif);
+            font-size: 0.55rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            padding: 0.8rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 1s;
+        }
+
+        .btn-restart:hover {
+            border-color: var(--gold-dim);
+            color: var(--gold);
+        }
+
+        .reading-loading {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: var(--text-dim);
+            text-align: center;
+            animation: pulse 2s ease-in-out infinite;
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- LANDING -->
+    <div id="screen-landing" class="screen active">
+        <svg class="eye-symbol" viewBox="0 0 64 64" fill="none" xmlns="https://www.w3.org/2000/svg">
+            <ellipse cx="32" cy="32" rx="28" ry="16" strok="#7a6230" stroke-width="0.75" />
+            <circle cx="32" cy="32" r="8" stroke="#c9a84c" stroke-width="0.75" />
+            <circle cx="32" cy="32" r="3" fill="#c9a84c" opacity="0.6" />
+            <line x1="4" y1="32" x2="60" y2="32" stroke="#2e2820" stroke-width="0.5" />
+            <line x1="32" y1="4" x2="32" y2="60" stork="#2e2820" stroke-width="0.5" />
+        </svg>
+
+        <h1 class="landing-title">The Archetype Mirror</h1>
+        <p class="landing-sub">A Kabbalistic · Tarot · Jungian Divination</p>
+        <div class="landing-divider"></div>
+        <p class="landing-des">
+            Seven questions stand between you and your reflection. <br>
+            Answer truthfully. The mirror does not lie.</p>
+
+        <div class="entry-form">
+            <div class="field-group">
+                <label class="field-label" for="input-name">Your name</label>
+                <input class="ritual-input" id="input-name" type="text" placeholder="As you wish to be known"
+                    autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field-group">
+                <label class="field-label" for="input-word">One word that defines you right now</label>
+                <input class="ritual-input" id="input-word" type="text" placeholder="Speak it into the void"
+                    autocomplete="off" spellcheck="false" maxlength="30">
+            </div>
+            <button class="btn-enter" id="btn-enter">Enter the Mirror</button>
+        </div>
+    </div>
+
+    <!-- QUESTIONS -->
+    <div id="screen-questions" class="screen">
+        <div class="q-header">
+            <div class="q-name" id="q-name-display"></div>
+            <div class="q-progress-track" id="q-progress"></div>
+        </div>
+        <div class="q-card" id="q-card">
+            <div class="q-number" id="q-number"></div>
+            <span class="q-symbol" id="q-symbol"></span>
+            <p class="q-text" id="q-text"></p>
+            <div class="q-choices" id="q-choices"></div>
+            <button class="btn-next" id="btn-next">Continue</button>
+        </div>
+    </div>
+
+    <!-- THRESHOLD -->
+    <div id="screen-threshold" class="screen">
+        <svg class="threshold-glyph" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="40" cy="40" r="36" stroke="#2e2820" stroke-width="0.75" />
+            <circle cx="40" cy="40" r="24" stroke="#7a6230" stroke-width="0.75" />
+            <polygon points="40,10 68,55 12,55" stroke="#c9a84c" stroke-width="0.75" fill="none" />
+            <polygon points="40,70 12,25 68,25" stroke="#c9a84c" stroke-width="0.5" fill="none" />
+            <circle cx="40" cy="40" r="4" fill="#c9a84c" opaicty="0.5" />
+        </svg>
+        <h2 class="threshold-title">The Mirror Turns</h2>
+        <p class="threshold-sub">Consulting the Tree of Life&hellip;</p>
+    </div>
+    <!-- RESULTS -->
+    <div id="screen-results" class="screen">
+        <div class="results-header">
+            <div class="results-name" id="results-name-display"></div>
+            <h2 class="results-title" id="results-title">Your Mirror</h2>
+            <div class="results-triad" id="results-triad"></div>
+        </div>
+        <div class="results-divider"></div>
+        <div class="results-body">
+            <div class="sigil-panel">
+                <div class="sigil-frame" id="sigil-frame"></div>
+                <div class="sigil-label" id="sigil-label">Your sigil</div>
+                <button class="btn-download" id="btn-download">Download Sigil</button>
+            </div>
+            <div class="reading-panel" id="reading-panel">
+                <div class="reading-loading">The mirror is reading you&hellip;</div>
+            </div>
+        </div>
+        <button class="btn-restart" id="btn-restart">Return to the Beginning</button>
+    </div>
+    <script>
+        const QUESTIONS = [
+            {
+                symbol: '☽',
+                text: 'You stand at the edge of a great forest at nightfall. What do you feel?',
+                choices: [
+                    { letter: 'A', text: 'A pull toward the darkness — something waits for you within.', tags: { kether: 1, hermit: 2, sage: 2 } },
+                    { letter: 'B', text: 'Unease. You turn back toward the lights of the village.', tags: { malkuth: 2, emperor: 1, ruler: 1 } },
+                    { letter: 'C', text: 'Awe. You have never seen anything so ancient and unknowable.', tags: { chokmah: 2, fool: 2, innocent: 1 } },
+                    { letter: 'D', text: 'Clarity. You map the treeline before deciding.', tags: { hod: 2, magician: 1, sage: 1 } }
+                ]
+            },
+            {
+                symbol: '⚖',
+                text: 'A stranger offers you a gift wrapped in black silk. You may not know what it contains before accepting. Do you take it?',
+                choices: [
+                    { letter: 'A', text: 'Yes. Risk is the price of experience.', tags: { geburah: 1, fool: 2, outlaw: 2 } },
+                    { letter: 'B', text: 'No. What cannot be known should not be invited in.', tags: { binah: 2, hierophant: 1, ruler: 1 } },
+                    { letter: 'C', text: 'Yes — but you study the stranger first.', tags: { tiphareth: 1, magician: 2, sage: 1 } },
+                    { letter: 'D', text: 'You ask what they want in return.', tags: { netzach: 1, justice: 2, caregiver: 1 } }
+                ]
+            },
+            {
+                symbol: '🜂',
+                text: 'Which element do you feel most lives inside you?',
+                choices: [
+                    { letter: 'A', text: 'Fire — will, transformation, destruction and creation.', tags: { geburah: 2, tower: 2, outlaw: 2 } },
+                    { letter: 'B', text: 'Water — depth, memory, the pull of the unseen.', tags: { yesod: 2, moon: 2, lover: 1 } },
+                    { letter: 'C', text: 'Air — thought, movement, the space between things.', tags: { hod: 2, star: 1, sage: 2 } },
+                    { letter: 'D', text: 'Earth — patience, body, the weight of what endures.', tags: { malkuth: 2, world: 2, ruler: 1 } }
+                ]
+            },
+            {
+                symbol: '∞',
+                text: 'You are given one year with no obligations, no eyes upon you. What do you do with it?',
+                choices: [
+                    { letter: 'A', text: 'Withdraw entirely. Study, fast, dissolve.', tags: { kether: 2, hermit: 2, sage: 2 } },
+                    { letter: 'B', text: 'Create something that will outlast you.', tags: { chokmah: 2, magician: 1, creator: 2 } },
+                    { letter: 'C', text: 'Travel. Lose yourself in places that don\'t know your name.', tags: { netzach: 1, fool: 2, explorer: 2 } },
+                    { letter: 'D', text: 'Build something — a house, a system, a community.', tags: { chesed: 2, emperor: 1, ruler: 2 } }
+                ]
+            },
+            {
+                symbol: '☿',
+                text: 'Your greatest wound has made you:',
+                choices: [
+                    { letter: 'A', text: 'Sharper. You see what others cannot.', tags: { geburah: 1, hermit: 1, sage: 2 } },
+                    { letter: 'B', text: 'Softer. You know now what fragility costs.', tags: { tiphareth: 2, star: 2, caregiver: 2 } },
+                    { letter: 'C', text: 'Untrusting. You operate alone.', tags: { yesod: 1, moon: 1, outlaw: 2 } },
+                    { letter: 'D', text: 'Determined. You refuse to be defined by it.', tags: { chesed: 1, chariot: 2, hero: 2 } }
+                ]
+            },
+            {
+                symbol: '⬡',
+                text: 'In a room full of people, you are most likely to be:',
+                choices: [
+                    { letter: 'A', text: 'Watching from the edge, cataloguing.', tags: { hod: 2, hermit: 1, sage: 1 } },
+                    { letter: 'B', text: 'At the center, drawing everything toward you.', tags: { tiphareth: 2, sun: 2, ruler: 1 } },
+                    { letter: 'C', text: 'Moving through quietly, connecting individuals.', tags: { netzach: 2, lovers: 1, caregiver: 1 } },
+                    { letter: 'D', text: 'Already gone. You came. You saw. You left.', tags: { yesod: 1, fool: 1, outlaw: 2 } }
+                ]
+            },
+            {
+                symbol: '✦',
+                text: 'What do you believe waits at the end of all seeking?',
+                choices: [
+                    { letter: 'A', text: 'Silence. The dissolution of the seeker.', tags: { kether: 3, world: 1, sage: 2 } },
+                    { letter: 'B', text: 'A door that was always open.', tags: { tiphareth: 2, fool: 1, innocent: 2 } },
+                    { letter: 'C', text: 'The self, finally honest.', tags: { yesod: 2, judgement: 2, hero: 1 } },
+                    { letter: 'D', text: 'Nothing. The seeking is the point.', tags: { chokmah: 2, hermit: 1, explorer: 2 } }
+                ]
+            }
+        ];
+
+        const SEPHIROTH_NAMES = {
+            kether: 'Kether', chokmah: 'Chokmah', binah: 'Binah', chesed: 'Chesed',
+            geburah: 'Geburah', tiphareth: 'Tiphareth', netzach: 'Netzach',
+            hod: 'Hod', yesod: 'Yesod', malkuth: 'Malkuth'
+        };
+
+        const ARCANA_NAMES = {
+            fool: 'The Fool', magician: 'The Magician', moon: 'The Moon',
+            hermit: 'The Hermit', emperor: 'The Emperor', hierophant: 'The Hierophant',
+            lovers: 'The Lovers', chariot: 'The Chariot', justice: 'Justice',
+            star: 'The Star', tower: 'The Tower', sun: 'The Sun',
+            world: 'The World', judgement: 'Judgement'
+        };
+
+        const ARCHETYPE_NAMES = {
+            sage: 'The Sage', ruler: 'The Ruler', outlaw: 'The Outlaw',
+            caregiver: 'The Caregiver', creator: 'The Creator', explorer: 'The Explorer',
+            hero: 'The Hero', innocent: 'The Innocent', lover: 'The Lover'
+        };
+
+        let userName = '';
+        let seedWord = '';
+        let currentQ = 0;
+        let answers = [];
+        let scores = {};
+
+        function initScores() {
+            scores = {};
+            [
+                ...Object.keys(SEPHIROTH_NAMES),
+                ...Object.keys(ARCANA_NAMES),
+                ...Object.keys(ARCHETYPE_NAMES)
+            ].forEach(k => scores[k] = 0);
+        }
+
+        function show(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function buildProgress() {
+            const track = document.getElementById('q-progress');
+            track.innerHTML = '';
+            QUESTIONS.forEach((_, i) => {
+                const pip = document.createElement('div');
+                pip.className = 'q-pip' + (i < currentQ ? ' done' : i === currentQ ? ' active' : '');
+                track.appendChild(pip);
+            });
+        }
+
+        function loadQuestion(index) {
+            const q = QUESTIONS[index];
+            const card = document.getElementById('q-card');
+            card.classList.remove('visible');
+
+            setTimeout(() => {
+                document.getElementById('q-number').textContent = `Question ${index + 1} of ${QUESTIONS.length}`;
+                document.getElementById('q-symbol').textContent = q.symbol;
+                document.getElementById('q-text').textContent = q.text;
+
+                const choicesEl = document.getElementById('q-choices');
+                choicesEl.innerHTML = '';
+                q.choices.forEach((c, ci) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'q-choice';
+                    btn.setAttribute('data-letter', c.letter);
+                    btn.setAttribute('data-index', ci);
+                    btn.textContent = c.text;
+                    btn.addEventListener('click', () => selectChoice(ci, btn));
+                    choicesEl.appendChild(btn);
+                });
+
+                const nextBtn = document.getElementById('btn-next');
+                nextBtn.classList.remove('ready');
+                buildProgress();
+                card.classList.add('visible');
+            }, 300);
+        }
+
+        function selectChoice(index, el) {
+            document.querySelectorAll('.q-choice').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            answers[currentQ] = index;
+            document.getElementById('btn-next').classList.add('ready');
+        }
+
+        function nextQuestion() {
+            const chosen = QUESTIONS[currentQ].choices[answers[currentQ]];
+            Object.entries(chosen.tags).forEach(([k, v]) => {
+                scores[k] = (scores[k] || 0) + v;
+            });
+
+            currentQ++;
+            if (currentQ < QUESTIONS.length) {
+                loadQuestion(currentQ);
+            } else {
+                finishQuestions();
+            }
+        }
+
+        function finishQuestions() {
+            show('screen-threshold');
+            const result = computeResult();
+            setTimeout(() => {
+                renderResults(result);
+            }, 2500);
+        }
+
+        function generateSigil(result) {
+            const sephMap = {
+                'Kether': { shape: 'crown', sides: 0 },
+                'Chokmah': { shape: 'circle', sides: 0 },
+                'Binah': { shape: 'triangle', sides: 3 },
+                'Chesed': { shape: 'square', sides: 4 },
+                'Geburah': { shape: 'pentagon', sides: 5 },
+                'Tiphareth': { shape: 'hexagram', sides: 6 },
+                'Netzach': { shape: 'heptagon', sides: 7 },
+                'Hod': { shape: 'octagon', sides: 8 },
+                'Yesod': { shape: 'crescent', sides: 0 },
+                'Malkuth': { shape: 'cross', sides: 4 }
+            };
+
+            const arcanaAngle = {
+                'The Fool': 0, 'The Magician': 16, 'The Moon': 32,
+                'The Hermit': 48, 'The Emperor': 64, 'The Hierophant': 80,
+                'The Lovers': 96, 'The Chariot': 112, 'Justice': 128,
+                'The Star': 144, 'The Tower': 160, 'The Sun': 176,
+                'The World': 192, 'Judgement': 208
+            };
+
+            const archetypeRings = {
+                'The Sage': 3, 'The Ruler': 4, 'The Outlaw': 2,
+                'The Caregiver': 5, 'The Creator': 6, 'The Explorer': 3,
+                'The Hero': 4, 'The Innocent': 5, 'The Lover': 2
+            };
+
+            const cx = 100, cy = 100, r = 70;
+            const sides = sephMap[result.sephirah]?.sides || 6;
+            const rot = arcanaAngle[result.arcana] || 0;
+            const rings = archetypeRings[result.archetype] || 3;
+
+            function polygon(cx, cy, r, n, rotation) {
+                const pts = [];
+                for (let i = 0; i < n; i++) {
+                    const angle = (Math.PI * 2 * i / n) - Math.PI / 2 + (rotation * Math.PI / 180);
+                    pts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+                }
+                return pts.join(' ');
+            }
+
+            function star(cx, cy, r, points, rotation) {
+                const pts = [];
+                const inner = r * 0.4;
+                for (let i = 0; i < points * 2; i++) {
+                    const angle = (Math.PI * i / points) - Math.PI / 2 + (rotation * Math.PI / 180);
+                    const radius = i % 2 === 0 ? r : inner;
+                    pts.push(`${cx + radius * Math.cos(angle)},${cy + radius * Math.sin(angle)}`);
+                }
+                return pts.join(' ');
+            }
+
+            let innerShapes = '';
+
+            if (result.sephirah === 'Kether') {
+                innerShapes = `
+            <circle cx="${cx}" cy="${cy}" r="60" stroke="#c9a84c" stroke-width="0.5" fill="none" opacity="0.6"/>
+            <circle cx="${cx}" cy="${cy}" r="40" stroke="#7a6230" stroke-width="0.5" fill="none" opacity="0.4"/>
+            <circle cx="${cx}" cy="${cy}" r="20" stroke="#c9a84c" stroke-width="0.75" fill="none"/>
+        `;
+            } else if (result.sephirah === 'Tiphareth') {
+                innerShapes = `
+            <polygon points="${star(cx, cy, 60, 6, rot)}" stroke="#c9a84c" stroke-width="0.75" fill="none"/>
+            <polygon points="${star(cx, cy, 40, 6, rot + 30)}" stroke="#7a6230" stroke-width="0.5" fill="none" opacity="0.6"/>
+        `;
+            } else if (result.sephirah === 'Yesod') {
+                innerShapes = `
+            <ellipse cx="${cx}" cy="${cy}" rx="60" ry="35" stroke="#c9a84c" stroke-width="0.75" fill="none" transform="rotate(${rot}, ${cx}, ${cy})"/>
+            <ellipse cx="${cx}" cy="${cy}" rx="40" ry="20" stroke="#7a6230" stroke-width="0.5" fill="none" transform="rotate(${rot + 45}, ${cx}, ${cy})" opacity="0.6"/>
+        `;
+            } else if (result.sephirah === 'Malkuth') {
+                innerShapes = `
+            <line x1="${cx}" y1="${cy - 60}" x2="${cx}" y2="${cy + 60}" stroke="#c9a84c" stroke-width="0.75" opacity="0.8"/>
+            <line x1="${cx - 60}" y1="${cy}" x2="${cx + 60}" y2="${cy}" stroke="#c9a84c" stroke-width="0.75" opacity="0.8"/>
+            <circle cx="${cx}" cy="${cy}" r="20" stroke="#7a6230" stroke-width="0.5" fill="none"/>
+        `;
+            } else if (sides >= 3) {
+                innerShapes = `
+            <polygon points="${polygon(cx, cy, 60, sides, rot)}" stroke="#c9a84c" stroke-width="0.75" fill="none"/>
+            <polygon points="${polygon(cx, cy, 38, sides, rot + (180 / sides))}" stroke="#7a6230" stroke-width="0.5" fill="none" opacity="0.6"/>
+        `;
+            }
+
+            let ringLines = '';
+            for (let i = 0; i < rings; i++) {
+                const angle = (rot + i * (360 / rings)) * Math.PI / 180;
+                const x2 = cx + 68 * Math.cos(angle);
+                const y2 = cy + 68 * Math.sin(angle);
+                ringLines += `<line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#7a6230" stroke-width="0.4" opacity="0.5"/>`;
+            }
+
+            return `
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="${cx}" cy="${cy}" r="90" stroke="#2e2820" stroke-width="0.5" fill="none"/>
+            <circle cx="${cx}" cy="${cy}" r="75" stroke="#1a1510" stroke-width="0.5" fill="none"/>
+            ${ringLines}
+            ${innerShapes}
+            <circle cx="${cx}" cy="${cy}" r="4" fill="#c9a84c" opacity="0.7"/>
+            <circle cx="${cx}" cy="${cy}" r="1.5" fill="#e8d5a3"/>
+        </svg>
+    `;
+        }
+
+        async function fetchReading(result) {
+            const prompt = `You are the Archetype Mirror — an ancient oracle drawing from Hermetic Kabbalah, Tarot, and Jungian depth psychology.
+
+The seeker is named ${result.name}. Their seed word — the word they chose to define themselves right now — is: "${result.word}".
+
+Their mirror has revealed three correspondences:
+- Sephirah: ${result.sephirah} (their position on the Tree of Life)
+- Major Arcana: ${result.arcana} (the Tarot force active in their life)
+- Archetype: ${result.archetype} (their dominant unconscious pattern)
+
+Write a reading in three parts. Be poetic, precise, and slightly unsettling — like something that knows too much. Draw real connections between all three correspondences and their seed word. Do not be generic. Speak directly to the seeker as "you".
+
+Respond ONLY with a JSON object in this exact format, no markdown, no preamble:
+{
+  "sephirah_reading": "2-3 sentences on their Sephirah and what it means for where they stand on the path",
+  "arcana_reading": "2-3 sentences on their active Arcana and the force it represents in their life right now",
+  "archetype_reading": "2-3 sentences on their shadow archetype and what it demands of them",
+  "synthesis": "3-4 sentences weaving all three together with their seed word into a unified statement about who they are at this moment"
+}`;
+
+            const response = await fetch('/api/reading', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 1000,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+
+            const data = await response.json();
+            console.log('API response:', JSON.stringify(data));
+            const text = data.content[0].text;
+            return JSON.parse(text);
+        }
+
+        function renderReadingPanel(reading, result) {
+            const panel = document.getElementById('reading-panel');
+            panel.innerHTML = `
+        <div class="reading-section">
+            <div class="reading-section-label">Sephirah</div>
+            <div class="reading-section-title">${result.sephirah}</div>
+            <div class="reading-section-text">${reading.sephirah_reading}</div>
+        </div>
+        <div class="reading-section">
+            <div class="reading-section-label">Major Arcana</div>
+            <div class="reading-section-title">${result.arcana}</div>
+            <div class="reading-section-text">${reading.arcana_reading}</div>
+        </div>
+        <div class="reading-section">
+            <div class="reading-section-label">Archetype</div>
+            <div class="reading-section-title">${result.archetype}</div>
+            <div class="reading-section-text">${reading.archetype_reading}</div>
+        </div>
+        <div class="reading-synthesis">${reading.synthesis}</div>
+    `;
+        }
+
+        async function renderResults(result) {
+            show('screen-results');
+
+            document.getElementById('results-name-display').textContent = result.name;
+            document.getElementById('results-title').textContent = 'Your Mirror';
+            document.getElementById('results-triad').textContent =
+                `${result.sephirah}  ·  ${result.arcana}  ·  ${result.archetype}`;
+
+            const sigilSVG = generateSigil(result);
+            document.getElementById('sigil-frame').innerHTML = sigilSVG;
+            document.getElementById('sigil-label').textContent =
+                `Sigil of ${result.sephirah}`;
+
+            document.getElementById('btn-download').addEventListener('click', () => {
+                const svgData = sigilSVG;
+                const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `archetype-mirror-sigil.svg`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            try {
+                const reading = await fetchReading(result);
+                renderReadingPanel(reading, result);
+            } catch (err) {
+                document.getElementById('reading-panel').innerHTML =
+                    `<div class="reading-loading">The mirror is clouded. Refresh and try again.</div>`;
+                console.error(err);
+            }
+        }
+
+        document.getElementById('btn-restart').addEventListener('click', () => {
+            show('screen-landing');
+            document.getElementById('input-name').value = '';
+            document.getElementById('input-word').value = '';
+        });
+
+        function computeResult() {
+            const top = (map) => Object.keys(map).reduce((a, b) =>
+                (scores[a] || 0) >= (scores[b] || 0) ? a : b
+            );
+            return {
+                sephirah: SEPHIROTH_NAMES[top(SEPHIROTH_NAMES)],
+                arcana: ARCANA_NAMES[top(ARCANA_NAMES)],
+                archetype: ARCHETYPE_NAMES[top(ARCHETYPE_NAMES)],
+                raw: scores,
+                name: userName,
+                word: seedWord
+            };
+        }
+
+        document.getElementById('btn-enter').addEventListener('click', () => {
+            const name = document.getElementById('input-name').value.trim();
+            const word = document.getElementById('input-word').value.trim();
+            if (!name || !word) return;
+            userName = name;
+            seedWord = word;
+            document.getElementById('q-name-display').textContent = name;
+            initScores();
+            currentQ = 0;
+            answers = [];
+            show('screen-questions');
+            loadQuestion(0);
+        });
+
+        document.getElementById('btn-next').addEventListener('click', () => {
+            if (answers[currentQ] === undefined) return;
+            nextQuestion();
+        });
+
+        document.getElementById('input-word').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('btn-enter').click();
+        });
+    </script>
+</body>
