@@ -1,167 +1,537 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cole Hall - Developer</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <title>Cole Hall — Full-Stack Developer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: calc(100vh - 73px);
-            text-align: center;
-            padding: 40px;
+        :root {
+            --black: #080809;
+            --surface: #0e0f11;
+            --panel: #13141a;
+            --border: #1e2028;
+            --border-bright: #2e3040;
+            --accent: #4f8ef7;
+            --accent-dim: #2a4a8a;
+            --text: #d8dce8;
+            --text-dim: #6b7280;
+            --text-faint: #2e3340;
+            --mono: 'Share Tech Mono', monospace;
+            --sans: 'Barlow', sans-serif;
         }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            min-height: 100vh;
+            background: var(--black);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* grid overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* HEADER */
+        header {
+            position: relative;
+            z-index: 1;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-id {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: blink 3s ease-in-out infinite;
+        }
+
+        .header-mono {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .header-links a {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .header-links a:hover { color: var(--accent); }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* HERO */
+        .hero {
+            position: relative;
+            z-index: 1;
+            padding: 6rem 0 5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-tag {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.25em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .hero-tag::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .hero-name {
+            font-family: var(--sans);
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .hero-name span { color: var(--accent); }
 
         .hero-title {
-            font-family: 'Cinzel Deocrative', cursive;
-            font-size: 52px;
-            color: var(--text);
-            text-shadow: 0 0 10px var(--accent-glow);
-            letter-spacing: 8px;
-            margin-bottom: 8px;
-            line-height: 1.2;
-        }
-
-        .hero-subtitle {
-            font-family: 'Cinzel', serif;
-            font-size: 13px;
-            color: var(--accent);
-            letter-spacing: 6px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            margin-bottom: 32px;
-            text-shadow: 0 0 10px var(--accent-glow);
+            margin-bottom: 2rem;
         }
 
         .hero-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            letter-spacing: 2px;
-            line-height: 2;
-            max-width: 500px;
-            margin-bottom: 48px;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .scroll-hint {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 9px;
+            font-size: 1.05rem;
             color: var(--text-dim);
-            letter-spacing: 3px;
-            animation: fade-pulse 2s infinite;
+            max-width: 520px;
+            line-height: 1.8;
         }
 
-        @keyframes fade-pulse {
-
-            0%,
-            100% {
-                opacity: 0.3;
-            }
-
-            50% {
-                opacity: 1;
-            }
-        }
-
-        .stats-bar {
+        .hero-stats {
             display: flex;
-            gap: 48px;
-            justify-content: center;
-            padding: 40px;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            margin-top: 0;
-            flex-wrap: wrap;
+            gap: 3rem;
+            margin-top: 3rem;
         }
 
-        .stat {
-            text-align: center;
+        .hero-stat-value {
+            font-family: var(--mono);
+            font-size: 1.8rem;
+            color: var(--text);
+            display: block;
         }
 
-        .stat-number {
-            font-family: 'Cinzel Decorative', cursive;
-            font-size: 28px;
+        .hero-stat-label {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            color: var(--text-faint);
+            text-transform: uppercase;
+        }
+
+        /* PROJECTS */
+        .projects {
+            position: relative;
+            z-index: 1;
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .section-tag {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.25em;
+            color: var(--text-faint);
+            text-transform: uppercase;
+        }
+
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .project-card {
+            background: var(--panel);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .project-card:hover { background: #16181f; }
+
+        .project-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .project-id {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            color: var(--text-faint);
+            text-transform: uppercase;
+        }
+
+        .project-arrow {
+            font-size: 0.8rem;
+            color: var(--text-faint);
+            transition: color 0.2s, transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .project-card:hover .project-arrow {
             color: var(--accent);
-            text-shadow: 0 0 10px var(--accent-glow);
-            display: block;
+            transform: translate(2px, -2px);
         }
 
-        .stat-label {
-            font-size: 9px;
-            color: var(--text-muted);
-            letter-spacing: 3px;
-            text-transform: upppercase;
-            margin-top: 4px;
-            display: block;
+        .project-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .project-desc {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+            flex: 1;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .project-tag {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.05em;
+            color: var(--text-faint);
+            border: 1px solid var(--border-bright);
+            padding: 2px 8px;
+            border-radius: 2px;
+        }
+
+        .project-tag.featured {
+            color: var(--accent);
+            border-color: var(--accent-dim);
+        }
+
+        /* FOOTER */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-mono {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--text-faint);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--text-faint);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--accent); }
+
+        @media (max-width: 600px) {
+            .hero-stats { gap: 2rem; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .footer-inner { flex-direction: column; gap: 1rem; text-align: center; }
         }
     </style>
 </head>
-
 <body>
 
-    <nav class="nav-logo">CH
-        <ul class="nav-links">
-            <li><a href="index.html" class="active">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="projects.html">Projects</a></li>
-            <li><a href="skills.html">Skills</a></li>
-            <li><a href="contact.html">Contact</a></li>
-        </ul>
-    </nav>
+    <header>
+        <div class="header-inner">
+            <div class="header-id">
+                <div class="header-dot"></div>
+                <span class="header-mono">COLE HALL / PORTFOLIO</span>
+            </div>
+            <nav class="header-links">
+                <a href="https://github.com/ColeHall234" target="_blank">GitHub</a>
+                <a href="mailto:your@email.com">Contact</a>
+            </nav>
+        </div>
+    </header>
 
-    <main>
-        <section class="hero">
-            <h1 class="hero-title">Cole Hall</h1>
-            <p class="hero-subtitle">Self-Taught Developer</p>
+    <section class="hero">
+        <div class="wrap">
+            <div class="hero-tag">Full-Stack Developer</div>
+            <h1 class="hero-name">Cole<br><span>Hall</span></h1>
+            <div class="hero-title">// Canton, Ohio</div>
             <p class="hero-desc">
-                Building games, tools, and experiences from scratch.
-                Every line written by hand. Every system understood.
+                Self-taught developer building real-time data applications,
+                interactive tools, and web experiences from the ground up.
             </p>
-            <div class="hero-buttons">
-                <a href="projects.html" class="btn">View Projects</a>
-                <a href="about.html" class="btn btn-purple">About Me</a>
-            </div>
-            <span class="scroll-hint">✦ scroll to explore ✦</span>
-        </section>
-
-        <div class="stats-bar">
-            <div class="stat">
-                <span class="stat-number">6</span>
-                <span class="stat-label">Projects Built</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number">7</span>
-                <span class="stat-label">Languages & Tools</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number">100%</span>
-                <span class="stat-label">Self Taught</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number">∞</span>
-                <span class="stat-label">Lines Debugged</span>
+            <div class="hero-stats">
+                <div>
+                    <span class="hero-stat-value">8</span>
+                    <span class="hero-stat-label">Projects</span>
+                </div>
+                <div>
+                    <span class="hero-stat-value">12+</span>
+                    <span class="hero-stat-label">Technologies</span>
+                </div>
+                <div>
+                    <span class="hero-stat-value">∞</span>
+                    <span class="hero-stat-label">Still Building</span>
+                </div>
             </div>
         </div>
-    </main>
-    <footer>
-        ✦ Cole Hall — Built by hand ✦
-    </footer>
-</body>
+    </section>
 
+    <section class="projects">
+        <div class="wrap">
+            <div class="section-header">
+                <span class="section-tag">Projects</span>
+                <div class="section-line"></div>
+            </div>
+
+            <div class="projects-grid">
+
+                <a class="project-card" href="https://github.com/ColeHall234/archetype-mirror" target="_blank">
+                    <div class="project-card-top">
+                        <span class="project-id">01 / ESOTERIC · AI</span>
+                        <span class="project-arrow">↗</span>
+                    </div>
+                    <div class="project-name">Archetype Mirror</div>
+                    <div class="project-desc">A Kabbalistic divination app that maps user responses across Sephiroth, Major Arcana, and Jungian archetypes — generating a personalized reading and unique procedural sigil.</div>
+                    <div class="project-tags">
+                        <span class="project-tag featured">Node / Express</span>
+                        <span class="project-tag featured">Claude API</span>
+                        <span class="project-tag">SVG Generation</span>
+                        <span class="project-tag">Vanilla JS</span>
+                    </div>
+                </a>
+
+                <a class="project-card" href="https://github.com/ColeHall234/solarwatch" target="_blank">
+                    <div class="project-card-top">
+                        <span class="project-id">02 / REAL-TIME · DATA</span>
+                        <span class="project-arrow">↗</span>
+                    </div>
+                    <div class="project-name">SolarWatch</div>
+                    <div class="project-desc">Real-time solar weather dashboard pulling live data from NASA DONKI and NOAA SWPC. Tracks solar flares, CMEs, Kp index, and geomagnetic storm activity.</div>
+                    <div class="project-tags">
+                        <span class="project-tag featured">Node / Express</span>
+                        <span class="project-tag featured">NASA API</span>
+                        <span class="project-tag featured">NOAA API</span>
+                        <span class="project-tag">Chart.js</span>
+                    </div>
+                </a>
+
+                <a class="project-card" href="https://github.com/ColeHall234/vortexops" target="_blank">
+                    <div class="project-card-top">
+                        <span class="project-id">03 / REAL-TIME · MAPS</span>
+                        <span class="project-arrow">↗</span>
+                    </div>
+                    <div class="project-name">VortexOps</div>
+                    <div class="project-desc">Professional-grade storm chasing web app with live radar, active weather alerts, and NWS data overlaid on an interactive map.</div>
+                    <div class="project-tags">
+                        <span class="project-tag featured">Node / Express</span>
+                        <span class="project-tag featured">Leaflet.js</span>
+                        <span class="project-tag">NOAA / NWS</span>
+                        <span class="project-tag">Real-Time</span>
+                    </div>
+                </a>
+
+                <a class="project-card" href="https://github.com/ColeHall234/shiftcraft" target="_blank">
+                    <div class="project-card-top">
+                        <span class="project-id">04 / FULL-STACK · SAAS</span>
+                        <span class="project-arrow">↗</span>
+                    </div>
+                    <div class="project-name">ShiftCraft</div>
+                    <div class="project-desc">Full-stack SaaS scheduling tool for managing shifts, staff availability, and work rotations with a clean dashboard interface.</div>
+                    <div class="project-tags">
+                        <span class="project-tag featured">Full-Stack</span>
+                        <span class="project-tag">Node / Express</span>
+                        <span class="project-tag">SQLite</span>
+                        <span class="project-tag">Dashboard</span>
+                    </div>
+                </a>
+
+                <a class="project-card" href="https://github.com/ColeHall234/debtfree" target="_blank">
+                    <div class="project-card-top">
+                        <span class="project-id">05 / TOOL · FINANCE</span>
+                        <span class="project-arrow">↗</span>
+                    </div>
+                    <div class="project-name">DebtFree</div>
+                    <div class="project-desc">Debt payoff calculator with avalanche and snowball strategy visualization. Built with Chart.js to show repayment timelines and interest saved.</div>
+                    <div class="project-tags">
+                        <span class="project-tag featured">Chart.js</span>
+                        <span class="project-tag">Vanilla JS</span>
+                        <span class="project-tag">Finance</span>
+                    </div>
+                </a>
+
+                <a class="project-card" href="https://github.com/ColeHall234/chore-champions" target="_blank">
+                    <div class="project-card-top">
+                        <span class="project-id">06 / APP · FAMILY</span>
+                        <span class="project-arrow">↗</span>
+                    </div>
+                    <div class="project-name">Chore Champions</div>
+                    <div class="project-desc">Family chore tracker with points, rewards, a spin wheel, and admin PIN panel. Deployed on a Raspberry Pi 5 as a kiosk app.</div>
+                    <div class="project-tags">
+                        <span class="project-tag featured">Raspberry Pi</span>
+                        <span class="project-tag">Kiosk Deploy</span>
+                        <span class="project-tag">localStorage</span>
+                        <span class="project-tag">Vanilla JS</span>
+                    </div>
+                </a>
+
+                <a class="project-card" href="https://github.com/ColeHall234/property-tycoon" target="_blank">
+                    <div class="project-card-top">
+                        <span class="project-id">07 / GAME · IDLE</span>
+                        <span class="project-arrow">↗</span>
+                    </div>
+                    <div class="project-name">Property Tycoon</div>
+                    <div class="project-desc">Idle clicker game with a real estate theme. Features property upgrades, passive income mechanics, and persistent save/load via localStorage.</div>
+                    <div class="project-tags">
+                        <span class="project-tag featured">Game Dev</span>
+                        <span class="project-tag">Vanilla JS</span>
+                        <span class="project-tag">localStorage</span>
+                    </div>
+                </a>
+
+                <a class="project-card" href="https://github.com/ColeHall234/dashboard" target="_blank">
+                    <div class="project-card-top">
+                        <span class="project-id">08 / TOOL · DASHBOARD</span>
+                        <span class="project-arrow">↗</span>
+                    </div>
+                    <div class="project-name">Personal Dashboard</div>
+                    <div class="project-desc">Live personal dashboard pulling weather, crypto prices, stock data, and RSS feeds into a single unified interface.</div>
+                    <div class="project-tags">
+                        <span class="project-tag featured">Live APIs</span>
+                        <span class="project-tag">Weather</span>
+                        <span class="project-tag">Crypto</span>
+                        <span class="project-tag">RSS</span>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-inner">
+            <span class="footer-mono">© 2026 COLE HALL</span>
+            <div class="footer-links">
+                <a href="https://github.com/ColeHall234" target="_blank">GitHub</a>
+                <a href="mailto:your@email.com">Email</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
 </html>
