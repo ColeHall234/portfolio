@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Game of Life</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: sans-serif;
+        }
+
+        canvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        #ui {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        #ui button {
+            background: #1a1a1a;
+            color: #ccc;
+            border: 0.5px solid #333;
+            border-radius: 8px;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        #ui button:hover {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        input[type="range"] {
+            accent-color: #00ff88;
+            width: 120px;
+            margin-left: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="grid"></canvas>
+    <div id="ui">
+        <button id="btnPlayPause">Pause</button>
+        <button id="btnRandomize">Randomize</button>
+        <button id="btnClear">Clear</button>
+        <label>
+            Speed
+            <input type="range" id="speedSlider" min="50" max="1000" step="50" value="100" style="direction: rtl;" />
+        </label>
+        <span id="genCount">Gen: 0</span>
+    </div>
+    <script>
+        const canvas = document.getElementById('grid');
+        const ctx = canvas.getContext('2d');
+
+        const COLS = 80;
+        const ROWS = 60;
+        const CELL = 12;
+        canvas.width = COLS * CELL;
+        canvas.height = ROWS * CELL;
+        function makeGrid() {
+            return new Array(ROWS).fill(null).map(() => new Array(COLS).fill(0));
+        }
+
+        let current = makeGrid();
+        let next = makeGrid();
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const x = col * CELL;
+                    const y = row * CELL;
+
+                    if (current[row][col] === 1) {
+                        ctx.fillStyle = '#00ff88';
+                        ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
+                    } else {
+                        ctx.fillStyle = '#111111';
+                        ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
+                    }
+                }
+            }
+        }
+        
+
+        function countNeighbors(row, col) {
+            let count = 0;
+
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    if (dr === 0 && dc === 0) continue;
+
+                    const r = (row + dr + ROWS) % ROWS;
+                    const c = (col + dc + COLS) % COLS;
+
+                    count += current[r][c];
+                }
+            }
+
+            return count;
+        }
+
+        function nextGeneration() {
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const alive = current[row][col] === 1;
+                    const neighbors = countNeighbors(row, col);
+
+                    if (alive) {
+                        next[row][col] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+                    } else {
+                        next[row][col] = (neighbors === 3) ? 1 : 0;
+                    }
+                }
+            }
+
+            [current, next] = [next, current];
+        }
+
+        let running = false;
+        let lastTime = 0;
+        let interval = 100;
+        let generation = 0;
+
+        function loop(timestamp) {
+            if (running) {
+                if (timestamp - lastTime >= interval) {
+                    nextGeneration();
+                    draw();
+                    lastTime = timestamp
+                    generation++;
+                    genCount.textContent = 'Gen: ' + generation;
+                }
+                requestAnimationFrame(loop);
+            }
+        }
+
+        const genCount = document.getElementById('genCount');
+
+        document.getElementById('btnPlayPause').addEventListener('click', () => {
+            running = !running;
+            document.getElementById('btnPlayPause').textContent = running ? 'Pause' : 'Play';
+            if (running) requestAnimationFrame(loop);
+        });
+
+        document.getElementById('btnRandomize').addEventListener('click', () => {
+            generation = 0;
+            genCount.textContent = 'Gen: 0';
+            randomize();
+            draw();
+        });
+
+        document.getElementById('btnClear').addEventListener('click', () => {
+            running = false;
+            document.getElementById('btnPlayPause').textContent = 'Play';
+            generation = 0;
+            genCount.textContent = 'Gen: 0';
+            current = makeGrid();
+            next = makeGrid();
+            draw();
+        });
+
+        document.getElementById('speedSlider').addEventListener('input', (e) => {
+            interval = parseInt(e.target.value);
+        });
+
+        function randomize() {
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    current[row][col] = Math.random() > 0.7 ? 1 : 0;
+                }
+            }
+        }
+
+        let painting = false;
+
+        canvas.addEventListener('mousedown', (e) => {
+            painting = true;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const col = Math.floor((e.clientX - rect.left) * scaleX / CELL);
+            const row = Math.floor((e.clientY - rect.top) * scaleY / CELL);
+            if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+                current[row][col] = 1;
+                draw();
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const col = Math.floor((e.clientX - rect.left) * scaleX / CELL);
+            const row = Math.floor((e.clientY - rect.top) * scaleY / CELL);
+            if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+                current[row][col] = 1;
+                draw();
+            }
+        });
+        
+        randomize();
+        running = true;
+        requestAnimationFrame(loop);
+        draw();
+        console.log('canvas ready:', canvas.width, 'x', canvas.height);
+    </script>
+</body>
+
+</html>
