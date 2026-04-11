@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FirstResponse CAD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <div class="topbar__brand">
+            <span class="topbar__logo">FR</span>
+            <span class="topbar__title">FIRSTRESPONSE</span>
+            <span class="topbar__subtitle">DISPATCH COMMAND</span>
+        </div>
+        <div class="topbar__stats">
+            <div class="stat-chip">
+                <span class="stat-chip__label">ACTIVE</span>
+                <span class="stat-chip__value" id="stat-incidents">0</span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-chip__label">AVAILABLE</span>
+                <span class="stat-chip__value" id="stat-available">0</span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-chip__label">RESOLVED</span>
+                <span class="stat-chip__value" id="stat-resolved">0</span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-chip__label">AVG RESPONSE</span>
+                <span class="stat-chip__value" id="stat-response">--</span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-chip__label">TIME</span>
+                <span class="stat-chip__value" id="stat-time">00:00</span>
+            </div>
+        </div>
+        <div class="topbar__controls">
+            <button class="ctrl-btn" id="btn-pause">⏸ PAUSE</button>
+            <button class="ctrl-btn ctrl-btn--active" id="btn-speed" data-speed="1">1x</button>
+            <button class="ctrl-btn" id="btn-shortcuts" onclick="toggleShortcutPanel()">?</button>
+            <button class="ctrl-btn" id="btn-mute">🔊</button>
+            <button class="ctrl-btn" id="btn-theme">☀</button>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+
+        <!-- LEFT PANEL — CALL QUEUE -->
+        <aside class="panel panel--left">
+            <div class="panel__header">
+                <span class="panel__title">INCOMING CALLS</span>
+                <span class="panel__badge" id="call-count">0</span>
+            </div>
+            <!-- LEFT PANEL — CALL QUEUE -->
+            <aside class="panel panel--left">
+                <div class="panel__header">
+                    <span class="panel__title">INCOMING CALLS</span>
+                    <span class="panel__badge" id="call-count">0</span>
+                </div>
+
+                <!-- FILTERS -->
+                <div class="queue-filters" id="queue-filters">
+                    <div class="filter-row">
+                        <button class="filter-btn filter-btn--active" data-filter-type="priority"
+                            data-filter-value="all">ALL</button>
+                        <button class="filter-btn filter-btn--critical" data-filter-type="priority"
+                            data-filter-value="critical">CRIT</button>
+                        <button class="filter-btn filter-btn--high" data-filter-type="priority"
+                            data-filter-value="high">HIGH</button>
+                        <button class="filter-btn filter-btn--medium" data-filter-type="priority"
+                            data-filter-value="medium">MED</button>
+                        <button class="filter-btn filter-btn--low" data-filter-type="priority"
+                            data-filter-value="low">LOW</button>
+                    </div>
+                    <div class="filter-row">
+                        <button class="filter-btn filter-btn--active" data-filter-type="dept"
+                            data-filter-value="all">ALL DEPTS</button>
+                        <button class="filter-btn filter-btn--police" data-filter-type="dept"
+                            data-filter-value="police">POL</button>
+                        <button class="filter-btn filter-btn--fire" data-filter-type="dept"
+                            data-filter-value="fire">FIRE</button>
+                        <button class="filter-btn filter-btn--ambulance" data-filter-type="dept"
+                            data-filter-value="ambulance">AMB</button>
+                        <button class="filter-btn filter-btn--tow" data-filter-type="dept"
+                            data-filter-value="tow">TOW</button>
+                        <button class="filter-btn filter-btn--utility" data-filter-type="dept"
+                            data-filter-value="utility">UTIL</button>
+                    </div>
+                </div>
+
+                <div class="call-queue" id="call-queue">
+                    <p class="empty-state">NO ACTIVE CALLS</p>
+                </div>
+            </aside>
+            
+        </aside>
+
+        <!-- CENTER — CITY MAP -->
+        <main class="map-wrap">
+            <div class="map-header">
+                <span class="map-header__title">CITY GRID — SECTOR VIEW</span>
+                <span class="map-header__coords" id="map-coords">--</span>
+            </div>
+            <div class="map-container">
+                <canvas id="city-map"></canvas>
+                <div class="map-overlay" id="map-overlay"></div>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL — UNIT STATUS -->
+        <aside class="panel panel--right">
+
+            <div class="panel__header">
+                <span class="panel__title">UNIT STATUS</span>
+            </div>
+
+            <div class="unit-department">
+                <div class="dept-header dept-header--police">
+                    <span class="dept-header__icon">🚔</span>
+                    <span class="dept-header__name">POLICE</span>
+                    <span class="dept-header__count" id="count-police">0</span>
+                </div>
+                <div class="unit-list" id="units-police"></div>
+            </div>
+
+            <div class="unit-department">
+                <div class="dept-header dept-header--fire">
+                    <span class="dept-header__icon">🚒</span>
+                    <span class="dept-header__name">FIRE</span>
+                    <span class="dept-header__count" id="count-fire">0</span>
+                </div>
+                <div class="unit-list" id="units-fire"></div>
+            </div>
+
+            <div class="unit-department">
+                <div class="dept-header dept-header--ambulance">
+                    <span class="dept-header__icon">🚑</span>
+                    <span class="dept-header__name">AMBULANCE</span>
+                    <span class="dept-header__count" id="count-ambulance">0</span>
+                </div>
+                <div class="unit-list" id="units-ambulance"></div>
+            </div>
+
+            <div class="unit-department">
+                <div class="dept-header dept-header--tow">
+                    <span class="dept-header__icon">🚛</span>
+                    <span class="dept-header__name">TOW</span>
+                    <span class="dept-header__count" id="count-tow">0</span>
+                </div>
+                <div class="unit-list" id="units-tow"></div>
+            </div>
+
+            <div class="unit-department">
+                <div class="dept-header dept-header--utility">
+                    <span class="dept-header__icon">⚡</span>
+                    <span class="dept-header__name">UTILITY</span>
+                    <span class="dept-header__count" id="count-utility">0</span>
+                </div>
+                <div class="unit-list" id="units-utility"></div>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <footer class="bottombar">
+        <div class="bottombar__tabs">
+            <button class="tab-btn tab-btn--active" data-tab="log">RADIO LOG</button>
+            <button class="tab-btn" data-tab="stats">STATISTICS</button>
+            <button class="tab-btn" data-tab="legend">MAP LEGEND</button>
+        </div>
+        <div class="bottombar__content">
+
+            <div class="tab-panel" id="tab-log">
+                <div class="incident-log" id="incident-log">
+                    <p class="empty-state">NO INCIDENTS RESOLVED YET</p>
+                </div>
+            </div>
+
+            <div class="tab-panel hidden" id="tab-stats">
+                <div class="stats-grid" id="stats-grid">
+                    <p class="empty-state">NO DATA YET</p>
+                </div>
+            </div>
+
+            <div class="tab-panel hidden" id="tab-legend">
+                <div class="legend">
+                    <div class="legend-item">
+                        <span class="legend-dot legend-dot--police"></span>
+                        <span>POLICE</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot legend-dot--fire"></span>
+                        <span>FIRE</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot legend-dot--ambulance"></span>
+                        <span>AMBULANCE</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot legend-dot--tow"></span>
+                        <span>TOW</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot legend-dot--utility"></span>
+                        <span>UTILITY</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot legend-dot--incident"></span>
+                        <span>INCIDENT</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot legend-dot--base"></span>
+                        <span>BASE</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+
+</body>
+
+</html>
