@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Budget App</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <header class="app-header">
+            <h1>Budget App</h1>
+            <div class="header-right">
+                <span id="welcomeMsg"></span>
+                <button class="btn-logout" id="btnLogout">Logout</button>
+            </div>
+        </header>
+
+        <main class="app-main">
+
+            <div class="summary-cards">
+                <div class="summary-card income">
+                    <span class="card-label">Income</span>
+                    <span class="card-value" id="totalIncome">$0.00</span>
+                </div>
+                <div class="summary-card expenses">
+                    <span class="card-label">Expenses</span>
+                    <span class="card-value" id="totalExpenses">$0.00</span>
+                </div>
+                <div class="summary-card balance">
+                    <span class="card-label">Balance</span>
+                    <span class="card-value" id="totalBalance">$0.00</span>
+                </div>
+            </div>
+
+            <div class="app-grid">
+
+                <div class="panel">
+                    <h2>Add transaction</h2>
+                    <div class="form-row">
+                        <select id="txType">
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                        <input type="number" id="txAmount" placeholder="Amount" min="0" step="0.01" />
+                    </div>
+                    <select id="txCategory"></select>
+                    <input type="text" id="txDescription" placeholder="Description (optional)" />
+                    <input type="date" id="txDate" />
+                    <button class="btn-primary" id="btnAddTx">Add transaction</button>
+                    <p class="error-msg" id="txError"></p>
+                </div>
+
+                <div class="panel">
+                    <h2>Spending by category</h2>
+                    <div class="chart-container">
+                        <canvas id="spendingChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="panel">
+                <div class="tx-header">
+                    <h2>Transactions</h2>
+                    <select id="monthFilter">
+                        <option value="all">All time</option>
+                    </select>
+                </div>
+                <div id="txList"></div>
+            </div>
+
+        </main>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

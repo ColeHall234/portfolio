@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Budgeting App</title>
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="auth-container">
+            <div class="auth-card">
+                <h1>Budget App</h1>
+                <p class="auth-subtitle">Track your money. Own your future.</p>
+
+                <div class="tab-row">
+                    <button class="tab active" id="tabLogin">Login</button>
+                    <button class="tab" id="tabRegister">Register</button>
+                </div>
+
+                <div id="formLogin">
+                    <input type="email" id="loginEmail" placeholder="Email" />
+                    <input type="password" id="loginPassword" placeholder="Password" />
+                    <button class="btn-primary" id="btnLogin">Sign In</button>
+                </div>
+
+                <div id="formRegister" style="display:none;">
+                    <input type="text" id="regUsername" placeholder="Username" />
+                    <input type="email" id="regEmail" placeholder="Email" />
+                    <input type="password" id="regPassword" placeholder="Password" />
+                    <button class="btn-primary" id="btnRegister">Create Account</button>
+                </div>
+
+                <p class="error-msg" id="authError"></p>
+            </div>
+        </div>
+        <script src="js/auth.js"></script>
+    </body>
+</html>
