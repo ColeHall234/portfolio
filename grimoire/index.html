@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Grimoire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap"
+        rel="stylesheet">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: #080810;
+        color: #c8a96e;
+        font-family: 'IM Fell English', serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 680px;
+        padding: 3rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .title {
+        font-family: 'IM Fell English SC', serif;
+        font-size: 42px;
+        color: #c8a96e;
+        text-align: center;
+        letter-spacing: 0.1em;
+    }
+
+    .subtitle {
+        font-size: 13px;
+        color: #4a3a6a;
+        text-align: center;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        margin-top: -1.5rem;
+    }
+
+    .divider {
+        width: 300px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #3d2f6a, transparent);
+    }
+
+    .response-box {
+        width: 100%;
+        background: #0d0b18;
+        border: 1px solid #2a1f4e;
+        border-radius: 8px;
+        padding: 2rem;
+        min-height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .response-text {
+        font-family: 'IM Fell English', serif;
+        font-size: 18px;
+        line-height: 1.9;
+        color: #c8a96e;
+        text-align: center;
+        font-style: italic;
+    }
+
+    .input-row {
+        width: 100%;
+        display: flex;
+        gap: 12px;
+    }
+
+    .query-input {
+        flex: 1;
+        background: #0d0b18;
+        border: 1px solid #2a1f4e;
+        border-radius: 8px;
+        padding: 0.8rem 1.2rem;
+        font-family: 'IM Fell English', serif;
+        font-size: 16px;
+        color: #c8a96e;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+    .query-input::placeholder {
+        color: #3d2f6a;
+    }
+
+    .query-input:focus {
+        border-color: #5a3fa0;
+    }
+
+    .conjure-btn {
+        background: #0d0b18;
+        border: 1px solid #4a3490;
+        border-radius: 8px;
+        padding: 0.8rem 1.5rem;
+        font-family: 'IM Fell English SC', serif;
+        font-size: 15px;
+        color: #9b7fd4;
+        cursor: pointer;
+        transition: all 0.3s;
+        letter-spacing: 0.05em;
+    }
+
+    .conjure-btn:hover {
+        background: #1a1030;
+        border-color: #7b5ecb;
+        color: #c8a96e;
+    }
+
+    .sigil-wrap {
+        width: 80px;
+        height: 80px;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    }
+
+    .sigil-wrap.active {
+        opacity: 1;
+        animation: sigilPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes sigilPulse {
+
+        0%,
+        100% {
+            filter: drop-shadow(0 0 4px #5a3fa0);
+        }
+
+        50% {
+            filter: drop-shadow(0 0 12px #9b7fd4);
+        }
+    }
+
+    .response-box {
+        position: relative;
+    }
+
+    .response-box::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 8px;
+        padding: 1px;
+        background: linear-gradient(90deg, #2a1f4e, #7b5ecb, #2a1f4e, #7b5ecb);
+        background-size: 300% 100%;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    }
+
+    .response-box.awakened::before {
+        opacity: 1;
+        animation: borderFlow 4s linear infinite;
+    }
+
+    @keyframes borderFlow {
+        0% {
+            background-position: 0% 0%;
+        }
+
+        100% {
+            background-position: 300% 0%;
+        }
+    }
+
+    #embers {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+
+<body>
+    <canvas id="embers"></canvas>
+    <div class="container">
+        <h1 class="title">The Grimoire</h1>
+        <p class="subtitle">Speak your question into the darkness</p>
+
+        <div class="divider"></div>
+
+        <div class="response-box">
+            <p class="response-text" id="response">
+                The page awaits your query, seeker. What truth do you wish to unveil?
+            </p>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sigil-wrap" id="sigilWrap">
+            <svg class="sigil" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#3d2f6a" stroke-width="0.5" />
+                <circle cx="50" cy="50" r="25" fill="none" stroke="#3d2f6a" stroke-width="0.5" />
+                <line x1="50" y1="10" x2="50" y2="90" stroke="#3d2f6a" stroke-width="0.5" />
+                <line x1="10" y1="50" x2="90" y2="50" stroke="#3d2f6a" stroke-width="0.5" />
+                <line x1="18" y1="18" x2="82" y2="82" stroke="#3d2f6a" stroke-width="0.5" />
+                <line x1="82" y1="18" x2="18" y2="82" stroke="#3d2f6a" stroke-width="0.5" />
+                <circle cx="50" cy="50" r="4" fill="#3d2f6a" />
+            </svg>
+        </div>
+        <div class="input-row">
+            <input type="text" class="query-input" id="queryInput" placeholder="Ask the Grimoire..." />
+            <button class="conjure-btn" id="conjureBtn">Conjure</button>
+        </div>
+    </div>
+    <script>
+        const btn = document.getElementById('conjureBtn');
+        const input = document.getElementById('queryInput');
+        const response = document.getElementById('response');
+        const sigilWrap = document.getElementById('sigilWrap');
+        const responseBox = document.querySelector('.response-box');
+
+        async function askGrimoire() {
+            const question = input.value.trim();
+            if (!question) return;
+
+            btn.disabled = true;
+            sigilWrap.classList.add('active');
+            responseBox.classList.add('awakened');
+            btn.textContent = 'Consulting...';
+            response.textContent = 'The pages turn of their own accord...';
+
+            const res = await fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question })
+            });
+
+            const data = await res.json();
+            response.textContent = data.answer;
+
+            btn.disabled = false;
+            sigilWrap.classList.remove('active');
+            btn.textContent = 'Conjure';
+            input.value = '';
+        }
+
+        btn.addEventListener('click', askGrimoire);
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') askGrimoire();
+        });
+
+        const canvas = document.getElementById('embers');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = Array.from({ length: 40 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 1.5 + 0.5,
+            speed: Math.random() * 0.4 + 0.1,
+            opacity: Math.random() * 0.4 + 0.05,
+            drift: (Math.random() - 0.5) * 0.3
+        }));
+
+        function drawEmbers() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(155, 127, 212, ${p.opacity})`;
+                ctx.fill();
+                p.y -= p.speed;
+                p.x += p.drift;
+                if (p.y < -5) {
+                    p.y = canvas.height + 5;
+                    p.x = Math.random() * canvas.width;
+                }
+            });
+            requestAnimationFrame(drawEmbers);
+        }
+
+        drawEmbers();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+
+</html>
